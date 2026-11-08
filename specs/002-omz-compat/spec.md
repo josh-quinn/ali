@@ -8,6 +8,15 @@
 
 **Input**: User description: "How does this work with Oh My Zsh? It should work with it." Follow-up to the review finding that shadow warnings cannot see aliases defined by Oh My Zsh (e.g. the git plugin's `gp='git push'`).
 
+## Clarifications
+
+### Session 2026-11-08
+
+- Q: Should overriding an existing shell alias require `--force`? → A: No. It is a warning only, consistent with ADR 0016 (warn, don't block); `--force` stays reserved for overwriting an ali alias.
+- Q: Should ali store the originals it overrides in its own store? → A: No. Originals are remembered in the live shell session only; the store may be synced to machines with different plugins.
+- Q: What does `ali doctor` return? → A: Exit 0 when every check that ran passed, 1 when any failed; checks it could not run are listed as "skipped", which alone does not fail.
+- Q: Does this feature change how plain aliases behave? → A: No. Only warnings, restoration on removal, the doctor command and block upgrades.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Warn when overriding an alias or function already in my shell (Priority: P1)
