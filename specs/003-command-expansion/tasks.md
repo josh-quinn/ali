@@ -42,7 +42,7 @@ description: "Task list for command expansion"
 - [x] T022 [US3] E2E (zpty, two sessions): per-terminal isolation, `--global`, prompt label and colour, protected double-Enter
 
 ## Phase 6: US4 Run-time mode (P2)
-- [ ] T023 [US4] Tests then `internal/cli/config.go` and regeneration on `expand` change
+- [x] T023 [US4] Tests then `internal/cli/config.go` and regeneration on `expand` change
 - [x] T024 [US4] Tests then `internal/render`: run-time functions with ali-quoted `eval` (research R5); `/dev/tty` confirm for protected
 - [ ] T025 [US4] E2E: line unchanged while typing, same command runs; tool-first line not expanded
 
