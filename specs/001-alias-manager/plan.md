@@ -43,6 +43,8 @@
 
 Post-design re-check: PASS (no violations; Complexity Tracking empty).
 
+**ADRs**: decisions made here are recorded in [`docs/adr/`](../../docs/adr/README.md) (0002-0020 at design time; 0021-0026 added by the 2026-11-08 security review).
+
 ## Project Structure
 
 ### Documentation (this feature)
