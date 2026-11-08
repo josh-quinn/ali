@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"strings"
@@ -164,6 +166,30 @@ func (a *app) expandRun(words []string) error {
 	if err != nil {
 		return err
 	}
+	if res.Protected {
+		if err := confirmOnTTY(res); err != nil {
+			return err
+		}
+	}
 	fmt.Fprintln(a.out, res.Line)
+	return nil
+}
+
+// openTTY is replaced in tests.
+var openTTY = func() (io.ReadWriteCloser, error) { return os.OpenFile("/dev/tty", os.O_RDWR, 0) }
+
+// confirmOnTTY asks before running a command resolved from a protected
+// environment (FR-014, Constitution VI). Without a terminal it refuses.
+func confirmOnTTY(res expand.Result) error {
+	tty, err := openTTY()
+	if err != nil {
+		return fmt.Errorf("environment %q is protected and there is no terminal to confirm on; not running: %s", res.Env, display(res.Line))
+	}
+	defer tty.Close()
+	fmt.Fprintf(tty, "ali: environment %q is protected.\n  %s\nRun it? [y/N] ", res.Env, display(res.Line))
+	answer, _ := bufio.NewReader(tty).ReadString('\n')
+	if a := strings.ToLower(strings.TrimSpace(answer)); a != "y" && a != "yes" {
+		return fmt.Errorf("not run")
+	}
 	return nil
 }

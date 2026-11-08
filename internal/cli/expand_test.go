@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"errors"
+	"io"
 	"strings"
 	"testing"
 )
@@ -75,5 +77,55 @@ func TestExpandRunQuotesWordsAndAlwaysExpandsTheAlias(t *testing.T) {
 		if strings.TrimSpace(out) != want {
 			t.Errorf("%q => %q, want %q", words, strings.TrimSpace(out), want)
 		}
+	}
+}
+
+type fakeTTY struct {
+	in  *strings.Reader
+	out strings.Builder
+}
+
+func (f *fakeTTY) Read(p []byte) (int, error)  { return f.in.Read(p) }
+func (f *fakeTTY) Write(p []byte) (int, error) { return f.out.Write(p) }
+func (f *fakeTTY) Close() error                { return nil }
+
+func withTTY(t *testing.T, answer string, fail bool) *fakeTTY {
+	t.Helper()
+	f := &fakeTTY{in: strings.NewReader(answer)}
+	old := openTTY
+	openTTY = func() (io.ReadWriteCloser, error) {
+		if fail {
+			return nil, errors.New("no tty")
+		}
+		return f, nil
+	}
+	t.Cleanup(func() { openTTY = old })
+	return f
+}
+
+func TestRunConfirmsProtectedEnvironmentsOnTheTerminal(t *testing.T) {
+	e := newEnv(t)
+	e.must("var", "add", "ns", "sys=kube-system")
+	e.must("env", "add", "prod", "ns=production", "--protect")
+	e.must("add", "kgp", "kubectl get pods -n {{ns}}")
+	t.Setenv("ALI_ENV", "prod")
+
+	tty := withTTY(t, "y\n", false)
+	out := e.must("expand", "--run", "--", "kgp")
+	if strings.TrimSpace(out) != "kubectl get pods -n production" || !strings.Contains(tty.out.String(), "protected") {
+		t.Errorf("out=%q tty=%q", out, tty.out.String())
+	}
+	withTTY(t, "n\n", false)
+	if out, _, err := e.run("expand", "--run", "--", "kgp"); err == nil || out != "" {
+		t.Errorf("declined command must not be printed for eval: out=%q err=%v", out, err)
+	}
+	withTTY(t, "", true)
+	if _, _, err := e.run("expand", "--run", "--", "kgp"); err == nil || !strings.Contains(err.Error(), "no terminal") {
+		t.Errorf("without a terminal it must refuse: %v", err)
+	}
+	// an explicit value does not need confirmation
+	withTTY(t, "", true)
+	if out := e.must("expand", "--run", "--", "kgp", "@sys"); strings.TrimSpace(out) != "kubectl get pods -n kube-system" {
+		t.Errorf("%q", out)
 	}
 }

@@ -113,6 +113,7 @@ func (s *Store) RenderInput(d *Data) render.Input {
 	// and "ali config" reports the problem.
 	st, _ := settings.Load(s.Dir)
 	in.PromptOff = st.Prompt == settings.PromptOff
+	in.Runtime = st.Expand == settings.Runtime
 	return in
 }
 

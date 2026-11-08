@@ -43,7 +43,7 @@ description: "Task list for command expansion"
 
 ## Phase 6: US4 Run-time mode (P2)
 - [ ] T023 [US4] Tests then `internal/cli/config.go` and regeneration on `expand` change
-- [ ] T024 [US4] Tests then `internal/render`: run-time functions with ali-quoted `eval` (research R5); `/dev/tty` confirm for protected
+- [x] T024 [US4] Tests then `internal/render`: run-time functions with ali-quoted `eval` (research R5); `/dev/tty` confirm for protected
 - [ ] T025 [US4] E2E: line unchanged while typing, same command runs; tool-first line not expanded
 
 ## Phase 7: US5 Discover and complete (P3)

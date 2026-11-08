@@ -18,6 +18,7 @@ type Input struct {
 	Envs      []string // environment names
 	Protected []string // protected environment names
 	PromptOff bool     // settings: prompt = off
+	Runtime   bool     // settings: expand = runtime (ADR 0030)
 }
 
 // Render produces aliases.zsh: the aliases (Zsh), plus, only when sub-aliases
@@ -27,7 +28,7 @@ func Render(in Input) string {
 	plain, funcs := Split(in)
 	out := Zsh(plain) + functionsCode(funcs) + envCode(in)
 	trigger, subw := gateTables(in)
-	if len(trigger) == 0 {
+	if len(trigger) == 0 || in.Runtime {
 		return out
 	}
 	var b strings.Builder
@@ -42,14 +43,19 @@ func Render(in Input) string {
 // Split separates aliases rendered as plain zsh aliases from those rendered as
 // functions. An alias containing a placeholder becomes a function that asks ali
 // to expand it, so it can never run with a literal {{name}} (for example when
-// the line editor is not involved).
+// the line editor is not involved). In run-time mode (research R5) every alias
+// that can expand becomes such a function, since nothing expands it earlier.
 func Split(in Input) (plain, funcs []alias.Alias) {
 	vars := map[string]bool{}
 	for _, v := range in.Vars {
 		vars[v] = true
 	}
+	trigger := map[string]bool{}
+	if in.Runtime {
+		trigger, _ = gateTables(in)
+	}
 	for _, a := range in.Aliases {
-		isFunc := false
+		isFunc := trigger[a.Name]
 		for _, p := range model.PlaceholderNames(a.Command) {
 			if vars[p] {
 				isFunc = true

@@ -129,3 +129,25 @@ func TestFunctionsAreRemovedWhenNoLongerNeeded(t *testing.T) {
 		t.Errorf("%s", out)
 	}
 }
+
+func TestRuntimeModeRendersFunctionsInsteadOfWidgets(t *testing.T) {
+	in := expInput()
+	in.Runtime = true
+	out := Render(in)
+	if strings.Contains(out, "_ali_accept") || strings.Contains(out, "bindkey") {
+		t.Errorf("runtime mode must not touch the line editor:\n%s", out)
+	}
+	for _, name := range []string{"k", "kgp", "gp"} { // gp: shared sub-aliases make git known
+		if !strings.Contains(out, "functions["+name+"]=") || strings.Contains(out, "\\alias -- "+name+"=") {
+			t.Errorf("%s should be a function in runtime mode:\n%s", name, out)
+		}
+	}
+	plain, _ := Split(noSharedRuntime())
+	for _, a := range plain {
+		if a.Name == "k" {
+			t.Error("k expands (kubectl has sub-aliases) and must be a function")
+		}
+	}
+}
+
+func noSharedRuntime() Input { in := noShared(); in.Runtime = true; return in }
