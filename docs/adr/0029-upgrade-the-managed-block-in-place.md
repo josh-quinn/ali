@@ -1,6 +1,6 @@
 # 0029. Upgrade the managed block in place
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-11-08
 - **Spec**: specs/002-omz-compat research R4
 
