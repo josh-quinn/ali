@@ -25,7 +25,7 @@ description: "Task list for command expansion"
 - [x] T009 [P] [US1] Tests then `internal/cli/sub.go` (add/update/rm/ls, `--shared`, `--json`)
 - [x] T010 [US1] Tests then `internal/cli/expand.go` (`ali expand '<line>'` and `--zle` protocol, research R4)
 - [x] T011 [US1] Tests then `internal/render`: `_ali_trigger` and sub-name gate tables; Space and Enter widgets chaining to previous widgets; paste skipped (research R2, R3)
-- [ ] T012 [US1] E2E (zpty): `k g p ` shows `kubectl get pods `; `k get p ` expands `p`; `k logs \p` stays literal; Enter without space expands; history text; `kubectl g p`; plain `ls` spawns no process
+- [x] T012 [US1] E2E (zpty): `k g p ` shows `kubectl get pods `; `k get p ` expands `p`; `k logs \p` stays literal; Enter without space expands; history text; `kubectl g p`; plain `ls` spawns no process
 
 ## Phase 4: US2 Placeholders and @ values (P1)
 - [ ] T013 [US2] Tests then `internal/expand`: placeholder parsing (defined variables only), `@key`, `@var=value`, ambiguity error, unmatched `@` words left alone, same value for repeated placeholders

@@ -102,7 +102,9 @@ _ali_gate() {
   \return 1
 }
 _ali_space() {
-  if [[ -z $PENDING ]] && (( ${+_ali_subw[${${(z)LBUFFER}[-1]}]} )) && _ali_gate "$LBUFFER"; then
+  # No PENDING check: fast typists type ahead while ali runs, and pastes do not
+  # reach this widget when bracketed paste is on (the zsh default since 5.1).
+  if (( ${+_ali_subw[${${(z)LBUFFER}[-1]}]} )) && _ali_gate "$LBUFFER"; then
     \local -a _r
     _r=("${(@0)$(\command ali expand --zle space -- "$LBUFFER" 2>/dev/null)}")
     [[ $_r[1] == ok ]] && LBUFFER=$_r[2]
