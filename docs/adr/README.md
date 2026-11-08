@@ -13,3 +13,8 @@ as the change it records.
 | [0005](0005-name-the-command-ali.md) | Name the command ali | Accepted |
 | [0006](0006-depend-only-on-cobra-and-go-toml.md) | Depend only on cobra and go-toml | Accepted |
 | [0007](0007-release-under-mit-via-goreleaser-and-a-homebrew-tap.md) | Release under MIT via GoReleaser and a Homebrew tap | Accepted |
+| [0008](0008-group-aliases-by-the-first-real-word-of-the-command.md) | Group aliases by the first real word of the command | Accepted |
+| [0009](0009-store-aliases-as-hand-editable-toml.md) | Store aliases as hand-editable TOML | Accepted |
+| [0010](0010-generate-aliases-zsh-and-source-it-from-zshrc.md) | Generate aliases.zsh and source it from .zshrc | Accepted |
+| [0011](0011-install-a-static-block-with-an-ali-wrapper-instead-of-eval.md) | Install a static block with an ali() wrapper instead of eval | Accepted |
+| [0012](0012-track-loaded-alias-names-so-removals-take-effect.md) | Track loaded alias names so removals take effect | Accepted |
