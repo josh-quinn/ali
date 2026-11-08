@@ -28,7 +28,9 @@ zpty -r z out '*__ALI_DONE__*' && print -rn -- "$out"
 zpty -d z
 `
 
-var ansiRe = regexp.MustCompile(`\x1b\[[0-9;?]*[A-Za-z]|\x1b[=>]|\r`)
+// CSI sequences, OSC sequences (terminal titles set by themes such as Oh My
+// Zsh's), keypad modes and carriage returns.
+var ansiRe = regexp.MustCompile(`\x1b\[[0-9;?]*[A-Za-z]|\x1b\][^\x07\x1b]*(\x07|\x1b\\)|\x1b[=>]|\r`)
 
 // zle types keys (use "\r" for Enter, "\t" for Tab) into a fresh interactive
 // shell in the sandbox and returns the screen output with escapes stripped.

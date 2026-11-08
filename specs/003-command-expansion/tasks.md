@@ -59,7 +59,9 @@ Each CLI task (T009, T010, T014, T019, T023, T026) includes Short, Long and Exam
 - [ ] T029 [P] README: sub-aliases, placeholders, environments, settings; update Platform support/limitations
 - [ ] T030 [P] CHANGELOG
 - [x] T031 Performance: SC-003 measurements recorded in research.md
-- [ ] T032 Manual compatibility pass with zsh-autosuggestions and zsh-syntax-highlighting; record result (and any limitation) in README
+- [x] T032 Manual compatibility pass with zsh-autosuggestions and zsh-syntax-highlighting; record result (and any limitation) in README
+  - Verified automatically against the developer's real Oh My Zsh (tests/e2e/omz_real_test.go, skipped when absent): Space and Enter expansion work, Oh My Zsh's magic-space binding is kept, ordinary Tab completion works.
+  - zsh-autosuggestions and zsh-syntax-highlighting are not installed on the dev machine, so they are NOT verified; the README says so. Widget wrapping follows the same pattern those plugins use.
 
 ## Dependencies
 Phase 2 → US1 → US2 → US3; US4 needs US2; US5 needs US1-US2. MVP = Phases 1-3 (sub-aliases with visible expansion). Within phases, `[P]` tasks touch different files.
