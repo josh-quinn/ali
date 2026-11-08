@@ -5,7 +5,9 @@
 ### I. Speed Is a Feature
 `ali` runs many times a day and sits on the critical path of the shell. Startup MUST stay
 under 10 ms for read operations, and the shell hook sourced from `.zshrc` MUST NOT spawn
-the binary on shell startup. The product ships as a single static binary with no runtime.
+the binary on shell startup. Command-line expansion MUST NOT spawn the binary for lines
+that use no ali expansion, and MUST add no more than 15 ms to a keypress that does.
+The product ships as a single static binary with no runtime.
 Rationale: a tool meant to preserve flow cannot itself add latency.
 
 ### II. Never Harm the User's Shell
@@ -27,8 +29,10 @@ inference, atomic writes and import parsing MUST each have explicit edge-case te
 End-to-end tests MUST run against a throwaway `HOME` and never touch the real one.
 
 ### V. Simplicity and Minimal Dependencies
-Scope for v1 is aliases only, zsh only, macOS first. Features beyond that (functions,
-env vars, other shells, TUI) require an amendment-level justification. Third-party
+Scope is zsh only, macOS first, and covers: aliases; tool-scoped sub-aliases; named
+placeholders with variables; and environments that switch variable values. Each of these
+expands to a plain command the user can see. Anything beyond that (shell functions the
+user writes, other shells, a TUI) requires an amendment-level justification. Third-party
 dependencies are limited to `spf13/cobra` and `pelletier/go-toml/v2`; anything else MUST
 be justified in the plan's complexity tracking.
 
@@ -37,6 +41,12 @@ Output for humans goes to stdout, diagnostics and errors to stderr, with non-zer
 codes on failure. Listing commands MUST offer a stable machine-readable form (`--json`).
 Destructive or overwriting actions require an explicit flag (`--force`) rather than a
 prompt, so the tool stays non-interactive and scriptable.
+
+### VII. Show What Will Run
+Expansions MUST be visible by default: the expanded command appears in the command line
+before it runs and is what history records. Hidden (run-time) expansion is an explicit
+opt-in. Values substituted into a command are data, inserted as single shell words, never
+as shell code. The active environment MUST be visible in the prompt.
 
 ## Public Open-Source Standards
 
@@ -89,4 +99,4 @@ MINOR for adding a principle or materially expanding guidance, PATCH for wording
 Every plan and review MUST verify compliance; added complexity MUST be justified in the
 plan's complexity tracking table.
 
-**Version**: 1.2.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
+**Version**: 2.0.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
