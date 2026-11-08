@@ -21,7 +21,7 @@ description: "Task list for command expansion"
 - [x] T007 Tests then `internal/expand` value quoting (research R7) incl. hostile-value table (SC-004)
 
 ## Phase 3: US1 Tool-scoped sub-aliases, visible expansion (P1) 🎯 MVP
-- [ ] T008 [US1] Tests then `internal/expand`: tool detection through aliases and wrappers; sub-alias expansion anywhere after the tool (`k get p`, `k logs x p`); tool-over-shared; `\word`; bare `--` ends expansion; per-command scoping across `;`/`|`/`&&`; no recursion
+- [x] T008 [US1] Tests then `internal/expand`: tool detection through aliases and wrappers; sub-alias expansion anywhere after the tool (`k get p`, `k logs x p`); tool-over-shared; `\word`; bare `--` ends expansion; per-command scoping across `;`/`|`/`&&`; no recursion
 - [ ] T009 [P] [US1] Tests then `internal/cli/sub.go` (add/update/rm/ls, `--shared`, `--json`)
 - [ ] T010 [US1] Tests then `internal/cli/expand.go` (`ali expand '<line>'` and `--zle` protocol, research R4)
 - [ ] T011 [US1] Tests then `internal/render`: `_ali_trigger` and sub-name gate tables; Space and Enter widgets chaining to previous widgets; paste skipped (research R2, R3)

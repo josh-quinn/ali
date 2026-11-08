@@ -31,6 +31,10 @@ Owner review of the plan (approved with comments):
 - Q: Does `k get p` leave `p` literal because `get` is not a sub-alias? → A: It did in the draft; changed. Sub-aliases expand anywhere after the tool, and users type `\p` when they need a literal (FR-003, ADR 0031). A bare `--` still ends expansion, since what follows belongs to another program.
 - Q: Documentation? → A: Help with examples for every command, help topics for typed syntax, and generated man pages (FR-019; feature 002 FR-008 covers existing commands).
 
+Decided during implementation (reported to the owner):
+
+- Q: After which tools do shared sub-aliases apply? → A: Only after tools ali knows: tools with their own sub-aliases, or tools that one of the user's ali aliases runs. Otherwise a shared `o` would rewrite `cp o x`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Tool-scoped sub-aliases, expanded as I type (Priority: P1)
@@ -146,7 +150,7 @@ I can see everything available for a tool in one place and get tab completion fo
 
 ### Functional Requirements
 
-- **FR-001**: Users MUST be able to add, list, update and remove sub-aliases scoped to a tool, and shared sub-aliases usable under any tool.
+- **FR-001**: Users MUST be able to add, list, update and remove sub-aliases scoped to a tool, and shared sub-aliases usable under any tool ali knows (one with its own sub-aliases, or one an ali alias runs).
 - **FR-002**: The tool for a line MUST be determined from its first word after expanding an ali alias and skipping wrappers, so `k`, `kubectl` and any other alias that runs kubectl share kubectl's sub-aliases.
 - **FR-003**: After the tool, every plain unquoted word that names a sub-alias MUST expand (tool's own first, then shared), regardless of its position or of non-sub-alias words before it; a leading backslash MUST keep a word literal; quoted words MUST never expand; a bare `--` MUST end sub-alias expansion for the rest of that command.
 - **FR-004**: By default, expansion MUST be shown in the command line before the command runs (on Space after a sub-alias, and fully on Enter), and history MUST record the expanded command.
