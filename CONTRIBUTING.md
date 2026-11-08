@@ -15,4 +15,7 @@ Thanks for helping. A few ground rules, taken from the project [constitution](.s
 make test vet fmt-check     # all must pass; CI runs the same on macOS
 ```
 
-Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`).
+Commits are small, single-purpose and green (`make fmt-check vet test` passes at every
+commit), written as [Conventional Commits](https://www.conventionalcommits.org/)
+(`feat(cli): ...`, `fix(store): ...`). Hard-to-reverse decisions get an ADR in
+[`docs/adr/`](docs/adr) in the same commit. Both are project rules; see the constitution.

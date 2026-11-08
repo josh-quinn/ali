@@ -49,9 +49,31 @@ and the spec-kit artifacts under `specs/`.
 ## Development Workflow
 
 Work flows through spec-kit: constitution, specify, clarify, plan, tasks, analyze,
-implement. Each change set is small, committed with a conventional-commit message, and
-leaves `go test ./...`, `go vet ./...` and `gofmt -l .` clean. The plan's Constitution
-Check MUST be re-run before implementation starts.
+implement. The plan's Constitution Check MUST be re-run before implementation starts.
+
+### Commits (project rule)
+- Every commit MUST be small and single-purpose, and MUST leave `make fmt-check vet test`
+  green, so any commit can be checked out and tested on its own.
+- Commit messages MUST follow [Conventional Commits](https://www.conventionalcommits.org/):
+  `type(scope): imperative subject`, with types `feat`, `fix`, `docs`, `test`, `build`, `ci`,
+  `refactor`, `perf`, `chore`. Breaking changes use `!` or a `BREAKING CHANGE:` footer.
+- Tests are committed together with the code they cover (never a red commit followed by a
+  fix). A bug fix MUST include a regression test that fails without the fix.
+- Explain *why* in the body whenever the subject alone would not make it obvious.
+- Unrelated changes MUST NOT share a commit. History is only rewritten before it is pushed.
+
+### Architecture Decision Records (project rule)
+- Decisions that are hard to reverse, or that touch interfaces, file formats, security,
+  dependencies, platform scope or process, MUST be recorded as an ADR in `docs/adr/`
+  (see ADR 0001), in the same commit as the change.
+- Accepted ADRs are not edited except for status and links; a changed decision gets a new
+  ADR that supersedes the old one. The index in `docs/adr/README.md` MUST stay current.
+- A plan's Constitution Check MUST list the ADRs it adds or supersedes.
+
+### Security (project rule)
+- Anything that writes outside `~/.config/ali/`, parses untrusted text, or emits shell code
+  MUST be reviewed for injection, path and permission issues, with a regression test for
+  every issue found.
 
 ## Governance
 
@@ -61,4 +83,4 @@ MINOR for adding a principle or materially expanding guidance, PATCH for wording
 Every plan and review MUST verify compliance; added complexity MUST be justified in the
 plan's complexity tracking table.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
+**Version**: 1.1.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
