@@ -46,6 +46,12 @@ and GoReleaser producing signed-checksum release artifacts plus a Homebrew tap f
 Releases follow semantic versioning. User-visible behaviour is documented in the README
 and the spec-kit artifacts under `specs/`.
 
+Every command MUST have a one-line summary, a long description and at least one example
+in its `--help`, and syntax that is typed in the shell (not as an `ali` subcommand) MUST be
+explained in a help topic (`ali help <topic>`). Man pages MUST be generated from the same
+command definitions (one page per command plus topic pages) and shipped with releases. A
+test MUST fail when a command is missing any of these.
+
 ## Development Workflow
 
 Work flows through spec-kit: constitution, specify, clarify, plan, tasks, analyze,
@@ -83,4 +89,4 @@ MINOR for adding a principle or materially expanding guidance, PATCH for wording
 Every plan and review MUST verify compliance; added complexity MUST be justified in the
 plan's complexity tracking table.
 
-**Version**: 1.1.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
+**Version**: 1.2.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
