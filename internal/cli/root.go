@@ -45,7 +45,7 @@ func NewRoot(version string, st *store.Store, out, errw io.Writer) *cobra.Comman
 	root.SetErr(errw)
 	root.SetFlagErrorFunc(func(_ *cobra.Command, err error) error { return &UsageError{err} })
 	root.CompletionOptions.DisableDefaultCmd = true
-	root.AddCommand(a.addCmd())
+	root.AddCommand(a.addCmd(), a.lsCmd())
 	return root
 }
 
