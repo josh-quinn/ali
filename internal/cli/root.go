@@ -3,10 +3,13 @@
 package cli
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -29,6 +32,7 @@ func IsUsage(err error) bool { var u *UsageError; return asUsage(err, &u) }
 type app struct {
 	st       *store.Store
 	out, err io.Writer
+	root     *cobra.Command
 }
 
 // NewRoot builds the ali command tree writing to out and errw.
@@ -51,6 +55,7 @@ Run "ali help files" to see which files ali reads and writes.`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+	a.root = root
 	root.SetOut(out)
 	root.SetErr(errw)
 	root.SetFlagErrorFunc(func(_ *cobra.Command, err error) error { return &UsageError{err} })
@@ -143,4 +148,18 @@ func nonNil(l []alias.Alias) []alias.Alias {
 		return []alias.Alias{}
 	}
 	return l
+}
+
+// writeCompletion writes zsh completion for ali's own commands, generated from
+// the command tree, to <config>/completions/_ali.
+func (a *app) writeCompletion() error {
+	var b bytes.Buffer
+	if err := a.root.GenZshCompletion(&b); err != nil {
+		return err
+	}
+	dir := filepath.Join(a.st.Dir, "completions")
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return err
+	}
+	return store.WriteAtomic(filepath.Join(dir, "_ali"), b.Bytes(), 0o600)
 }

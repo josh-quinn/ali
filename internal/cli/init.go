@@ -41,6 +41,9 @@ supported.`,
 			if err := a.st.Update(func(*store.Data) error { return nil }); err != nil {
 				return err
 			}
+			if err := a.writeCompletion(); err != nil {
+				return err
+			}
 			res, err := shellconf.Install(rc)
 			if err != nil {
 				return err

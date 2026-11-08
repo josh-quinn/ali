@@ -134,8 +134,12 @@ func TestRuntimeModeRendersFunctionsInsteadOfWidgets(t *testing.T) {
 	in := expInput()
 	in.Runtime = true
 	out := Render(in)
-	if strings.Contains(out, "_ali_accept") || strings.Contains(out, "bindkey") {
-		t.Errorf("runtime mode must not touch the line editor:\n%s", out)
+	// typing never rewrites the line: no Enter or Space widgets (Tab only suggests)
+	if strings.Contains(out, "_ali_accept") || strings.Contains(out, "_ali_space") {
+		t.Errorf("runtime mode must not rewrite the command line:\n%s", out)
+	}
+	if !strings.Contains(out, "_ali_tab") {
+		t.Error("Tab completion should still be available in runtime mode")
 	}
 	for _, name := range []string{"k", "kgp", "gp"} { // gp: shared sub-aliases make git known
 		if !strings.Contains(out, "functions["+name+"]=") || strings.Contains(out, "\\alias -- "+name+"=") {

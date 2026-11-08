@@ -28,7 +28,7 @@ func Render(in Input) string {
 	plain, funcs := Split(in)
 	out := Zsh(plain) + functionsCode(funcs) + envCode(in)
 	trigger, subw := gateTables(in)
-	if len(trigger) == 0 || in.Runtime {
+	if len(trigger) == 0 {
 		return out
 	}
 	var b strings.Builder
@@ -36,7 +36,11 @@ func Render(in Input) string {
 	b.WriteString("\\typeset -gA _ali_trigger _ali_subw\n")
 	b.WriteString("_ali_trigger=(" + assocOnes(trigger) + ")\n")
 	b.WriteString("_ali_subw=(" + assocOnes(subw) + ")\n")
-	b.WriteString(widgets)
+	b.WriteString(gateFn)
+	if !in.Runtime {
+		b.WriteString(widgets)
+	}
+	b.WriteString(tabWidget)
 	return b.String()
 }
 
@@ -169,12 +173,42 @@ func assocOnes(set map[string]bool) string {
 // widgets is the line-editor glue (research R3, R4). Builtins are escaped
 // (ADR 0021). Previously bound widgets are captured once, so re-sourcing this
 // file after every ali command never makes ali wrap itself.
-const widgets = `# ali: show sub-alias and placeholder expansion in the command line (ADR 0030)
-_ali_gate() {
+const gateFn = `_ali_gate() {
   \local _w
   for _w in ${(z)1}; do (( ${+_ali_trigger[$_w]} )) && \return 0; done
   \return 1
 }
+`
+
+// tabWidget offers @ values and sub-aliases on Tab (FR-016) and otherwise hands
+// Tab to whatever it was bound to; only trigger lines start a process.
+const tabWidget = `_ali_tab() {
+  if _ali_gate "$LBUFFER"; then
+    _ali_cands=("${(@0)$(\command ali expand --complete -- "$LBUFFER" 2>/dev/null)}")
+    _ali_cands=(${_ali_cands:#})
+    if (( $#_ali_cands )); then
+      \zle _ali_menu
+      \return
+    fi
+  fi
+  \zle _ali_orig_tab
+}
+_ali_menu_fn() { \compadd -Q -- $_ali_cands; }
+\zmodload -i zsh/zleparameter 2>/dev/null
+if (( ! ${+widgets[_ali_orig_tab]} )); then
+  \zmodload -i zsh/complete 2>/dev/null
+  _ali_tb=${${(z)"$(\bindkey -M main '^I')"}[2]}
+  [[ -z $_ali_tb || $_ali_tb == _ali_tab ]] && _ali_tb=expand-or-complete
+  \zle -A $_ali_tb _ali_orig_tab
+  \zle -C _ali_menu complete-word _ali_menu_fn
+  \zle -N _ali_tab
+  \bindkey -M main '^I' _ali_tab
+  \bindkey -M viins '^I' _ali_tab 2>/dev/null
+  \unset _ali_tb
+fi
+`
+
+const widgets = `# ali: show sub-alias and placeholder expansion in the command line (ADR 0030)
 _ali_space() {
   # No PENDING check: fast typists type ahead while ali runs, and pastes do not
   # reach this widget when bracketed paste is on (the zsh default since 5.1).

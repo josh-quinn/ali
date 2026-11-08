@@ -48,7 +48,7 @@ description: "Task list for command expansion"
 
 ## Phase 7: US5 Discover and complete (P3)
 - [x] T026 [P] [US5] Tests then `internal/cli/show.go`
-- [ ] T027 [US5] Tests then generated completion for ali commands and Tab widget for `@` values and sub-aliases, falling through otherwise (research R11)
+- [x] T027 [US5] Tests then generated completion for ali commands and Tab widget for `@` values and sub-aliases, falling through otherwise (research R11)
 - [ ] T028 [US5] E2E (zpty): `@<TAB>` offers `one sys`; `k <TAB>` offers kubectl sub-aliases
 
 ## Documentation (applies to every CLI task above)

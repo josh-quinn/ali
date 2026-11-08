@@ -90,6 +90,12 @@ func Block() string {
 	return BlockStart + "\n# ali block v" + strconv.Itoa(BlockVersion) + ", managed by ali init zsh" + `
 _ali_dir="${ALI_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/ali}"
 [ -f "$_ali_dir/aliases.zsh" ] && \source "$_ali_dir/aliases.zsh"
+# Tab completion for ali's own commands (written by "ali init zsh"); needs compinit.
+if [[ -r $_ali_dir/completions/_ali ]]; then
+  fpath=("$_ali_dir/completions" $fpath)
+  \autoload -Uz _ali
+  (( ${+functions[compdef]} )) && compdef _ali ali
+fi
 # At the first prompt, after every rc file has run, keep a copy of the alias
 # table so "ali doctor" can spot ali aliases that something loaded later changed.
 # One bulk copy, no loop, no process; the hook then removes itself.

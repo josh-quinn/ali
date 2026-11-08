@@ -48,7 +48,7 @@ func (a *app) expandOptions(mode expand.Mode) expand.Options {
 
 func (a *app) expandCmd() *cobra.Command {
 	var zle string
-	var run bool
+	var run, complete bool
 	cmd := &cobra.Command{
 		Use:   "expand LINE",
 		Short: "Show what a command line expands to, without running it",
@@ -76,6 +76,14 @@ The ali shell integration also uses this command internally (--zle).`,
 			if run {
 				return a.expandRun(args)
 			}
+			if complete {
+				d, err := a.st.Load()
+				if err != nil {
+					return nil // never break the shell's Tab key
+				}
+				fmt.Fprint(a.out, strings.Join(expand.Complete(args[0], defsFrom(d)), "\x00"))
+				return nil
+			}
 			d, err := a.st.Load()
 			if err != nil {
 				return err
@@ -95,6 +103,8 @@ The ali shell integration also uses this command internally (--zle).`,
 	cmd.Flags().MarkHidden("zle")
 	cmd.Flags().BoolVar(&run, "run", false, "internal: expand already-split words for eval (alias functions)")
 	cmd.Flags().MarkHidden("run")
+	cmd.Flags().BoolVar(&complete, "complete", false, "internal: Tab-completion candidates for the line so far")
+	cmd.Flags().MarkHidden("complete")
 	return cmd
 }
 
