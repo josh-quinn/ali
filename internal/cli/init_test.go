@@ -37,3 +37,19 @@ func TestInitDryRunAndInstall(t *testing.T) {
 		t.Error("only zsh is supported")
 	}
 }
+
+func TestInitReportsUpgradeAndRefusesDamagedBlock(t *testing.T) {
+	e := newEnv(t)
+	rc := filepath.Join(e.dir, ".zshrc")
+	os.WriteFile(rc, []byte("export A=1\n# >>> ali >>>\nold\n# <<< ali <<<\n"), 0o644)
+	out := e.must("init", "zsh")
+	if !strings.Contains(out, "updated the ali block in "+rc) || !strings.Contains(out, "backup:") {
+		t.Errorf("upgrade output: %q", out)
+	}
+
+	os.WriteFile(rc, []byte("# >>> ali >>>\nno end marker\n"), 0o644)
+	_, _, err := e.run("init", "zsh")
+	if err == nil || !strings.Contains(err.Error(), "markers") {
+		t.Errorf("want damaged-block error, got %v", err)
+	}
+}

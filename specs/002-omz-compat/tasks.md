@@ -29,7 +29,7 @@ description: "Task list for Oh My Zsh compatibility"
 - [x] T009 [US2] E2E: add over `gp`, rm → `git push` restored in the same shell; update keeps the original remembered
 
 ## Phase 5: US4 Upgrade the block (P2)
-- [ ] T010 [US4] Tests then `internal/cli/init.go`: "updated" outcome and messages
+- [x] T010 [US4] Tests then `internal/cli/init.go`: "updated" outcome and messages
 - [ ] T011 [US4] E2E: v1 block + surrounding content → upgraded, rest byte-identical, second run no-op
 
 ## Phase 6: US3 Doctor (P2)

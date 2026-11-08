@@ -19,7 +19,8 @@ aliases in every new shell and defines a small "ali" shell function so changes a
 to the current terminal immediately. It never runs ali at shell startup.
 
 A timestamped backup is written first. Running init again does nothing if the block
-is current. Use --dry-run to see the block without changing anything. Only zsh is
+is current; if the block came from an older ali, init replaces just the block and
+leaves the rest of the file untouched. Use --dry-run to see the block without changing anything. Only zsh is
 supported.`,
 		Example: `  ali init zsh --dry-run
   ali init zsh`,
@@ -48,7 +49,11 @@ supported.`,
 				fmt.Fprintf(a.out, "already set up (%s)\n", rc)
 				return nil
 			}
-			fmt.Fprintf(a.out, "added the ali block to %s\n", rc)
+			if res.Updated {
+				fmt.Fprintf(a.out, "updated the ali block in %s\n", rc)
+			} else {
+				fmt.Fprintf(a.out, "added the ali block to %s\n", rc)
+			}
 			if res.Backup != "" {
 				fmt.Fprintf(a.out, "backup: %s\n", res.Backup)
 			}
