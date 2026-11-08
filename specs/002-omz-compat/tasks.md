@@ -15,7 +15,7 @@ description: "Task list for Oh My Zsh compatibility"
 - [x] T021 `internal/tools/gendocs` + `make man` generating `man/*.1` (ali.1, per command, topics); GoReleaser `before` hook and archive files; Homebrew formula installs pages; test that generation succeeds and every command has a page (ADR 0038, SC-006)
 
 ## Phase 2: Foundational (blocks US1, US2, US4)
-- [ ] T002 Tests then `internal/shellconf`: locate block markers, `Install` replaces an outdated block in place with backup; error on unbalanced/duplicate markers; bytes outside the block unchanged (research R4)
+- [x] T002 Tests then `internal/shellconf`: locate block markers, `Install` replaces an outdated block in place with backup; error on unbalanced/duplicate markers; bytes outside the block unchanged (research R4)
 - [ ] T003 Tests then `internal/render`: block v2 text with version line; wrapper still hijack-safe (ADR 0021)
 
 ## Phase 3: US1 Warn on overriding shell aliases/functions (P1) 🎯 MVP

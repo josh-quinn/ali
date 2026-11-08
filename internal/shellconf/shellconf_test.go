@@ -117,3 +117,70 @@ func TestInstallKeepsSymlinkedZshrc(t *testing.T) {
 		t.Errorf("block not written into the symlink target:\n%s", b)
 	}
 }
+
+const oldBlock = render.BlockStart + "\nsome old ali code\n" + render.BlockEnd + "\n"
+
+func TestInstallUpgradesAnOutdatedBlockInPlace(t *testing.T) {
+	rc := filepath.Join(t.TempDir(), ".zshrc")
+	before, after := "export A=1\nsource $ZSH/oh-my-zsh.sh\n\n", "\nalias late=x\n# trailing, no newline"
+	os.WriteFile(rc, []byte(before+oldBlock+after), 0o600)
+
+	res, err := Install(rc)
+	if err != nil || !res.Changed || !res.Updated || res.Backup == "" {
+		t.Fatalf("%+v %v", res, err)
+	}
+	got, _ := os.ReadFile(rc)
+	if want := before + render.Block() + after; string(got) != want {
+		t.Errorf("content outside the block changed:\n got %q\nwant %q", got, want)
+	}
+	if st, _ := os.Stat(rc); st.Mode().Perm() != 0o600 {
+		t.Errorf("mode changed to %v", st.Mode().Perm())
+	}
+	if bk, _ := os.ReadFile(res.Backup); string(bk) != before+oldBlock+after {
+		t.Error("backup is not the original file")
+	}
+	if res2, _ := Install(rc); res2.Changed {
+		t.Error("second run should be a no-op")
+	}
+}
+
+func TestInstallRefusesDamagedBlocks(t *testing.T) {
+	cases := map[string]string{
+		"no end":       "x\n" + render.BlockStart + "\nstuff\n",
+		"no start":     "x\n" + render.BlockEnd + "\n",
+		"end first":    render.BlockEnd + "\n" + render.BlockStart + "\n",
+		"two blocks":   oldBlock + oldBlock,
+		"nested start": render.BlockStart + "\n" + oldBlock,
+	}
+	for name, body := range cases {
+		rc := filepath.Join(t.TempDir(), ".zshrc")
+		os.WriteFile(rc, []byte(body), 0o644)
+		if _, err := Install(rc); err == nil {
+			t.Errorf("%s: want error", name)
+		}
+		if got, _ := os.ReadFile(rc); string(got) != body {
+			t.Errorf("%s: file was modified", name)
+		}
+		if m, _ := filepath.Glob(rc + ".ali-backup-*"); len(m) != 0 {
+			t.Errorf("%s: backup written for a refused change", name)
+		}
+	}
+}
+
+func TestInspect(t *testing.T) {
+	cases := map[string]BlockState{
+		"":                          BlockMissing,
+		"x\n" + render.Block():      BlockCurrent,
+		"x\n" + oldBlock:            BlockOutdated,
+		render.BlockStart + "\nx\n": BlockDamaged,
+	}
+	for body, want := range cases {
+		if got, _, _ := Inspect(body); got != want {
+			t.Errorf("Inspect(%q) = %v, want %v", body, got, want)
+		}
+	}
+	_, start, _ := Inspect("a\nb\n" + render.Block())
+	if start != 3 {
+		t.Errorf("block start line = %d, want 3", start)
+	}
+}
