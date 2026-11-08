@@ -42,7 +42,7 @@ from a script it is reported as skipped. Exits with status 1 if any check fails.
 				gen, snap := doctor.ParseState(string(raw))
 				in.Overridden = map[string]string{}
 				if storeErr == nil {
-					plain, _ := render.Split(d.RenderInput())
+					plain, _ := render.Split(a.st.RenderInput(d))
 					if gen != render.Gen(plain) {
 						in.SnapshotStale = true
 					} else {

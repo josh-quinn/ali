@@ -37,7 +37,7 @@ description: "Task list for command expansion"
 ## Phase 5: US3 Environments (P2)
 - [x] T018 [US3] Tests then `internal/expand`: precedence chain (FR-009), `@@env` (implemented and tested together with T013)
 - [x] T019 [P] [US3] Tests then `internal/cli/env.go` (add/set/unset/protect/rm/ls/show/use/off/current)
-- [ ] T020 [US3] Tests then `internal/render`: wrapper handles `env use|off` (export/unset `ALI_ENV`), precmd prompt hook (research R8, R9); the hook must validate the environment name itself before putting it in RPROMPT (global-env and ALI_ENV are user-editable, and prompt_subst may be on), with a hostile-name test
+- [x] T020 [US3] Tests then `internal/render`: wrapper handles `env use|off` (export/unset `ALI_ENV`), precmd prompt hook (research R8, R9); the hook must validate the environment name itself before putting it in RPROMPT (global-env and ALI_ENV are user-editable, and prompt_subst may be on), with a hostile-name test
 - [ ] T021 [US3] Tests then protected-environment confirm path in widget (`confirm` status → second Enter)
 - [ ] T022 [US3] E2E (zpty, two sessions): per-terminal isolation, `--global`, prompt label and colour, protected double-Enter
 

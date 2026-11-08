@@ -18,7 +18,7 @@ const (
 	// BlockVersion is bumped whenever the block text changes, so people reading
 	// their .zshrc can tell which revision they have. Upgrades compare the whole
 	// text, not this number (ADR 0029).
-	BlockVersion = 2
+	BlockVersion = 3
 )
 
 // Quote wraps s in single quotes so zsh treats it literally.
@@ -101,11 +101,44 @@ _ali_startup_check() {
 }
 \autoload -Uz add-zsh-hook
 \add-zsh-hook precmd _ali_startup_check
+# Show the active environment in the right prompt, red when protected. The name
+# is validated here because ALI_ENV and global-env are user-editable and
+# prompt_subst may be on. Reading the file with $(<...) starts no process.
+_ali_prompt() {
+  \local _e=${ALI_ENV-}
+  [[ -z $_e && -r $_ali_dir/global-env ]] && _e=$(<$_ali_dir/global-env)
+  _e=${_e%%$'\n'*}
+  [[ $_e =~ '^[a-z][a-z0-9_-]*$' ]] || _e=
+  RPROMPT=${RPROMPT#"${_ali_env_label-}"}
+  _ali_env_label=
+  if [[ -n $_e ]] && (( ! ${+_ali_prompt_off} )); then
+    if (( ${+_ali_protected[$_e]} )); then _ali_env_label="%F{red}[ali:$_e]%f"; else _ali_env_label="%F{cyan}[ali:$_e]%f"; fi
+    RPROMPT=$_ali_env_label$RPROMPT
+  fi
+}
+# For custom themes: put $(ali_prompt_info) in your prompt and set "ali config set prompt off".
+ali_prompt_info() { \print -rn -- "${_ali_env_label-}"; }
+\typeset -gA _ali_protected
+\add-zsh-hook precmd _ali_prompt
 ali() {
   # For "ali add NAME", tell the binary what NAME means in this shell (ADR 0027).
   if [[ $1 == doctor ]]; then
     # Pass the startup snapshot: generation, then NUL-separated name/value pairs.
     \print -rN -- "${_ali_gen_at_start-}" "${(@kv)_ali_at_start}" | \command ali doctor --shell-state - "${@:2}"
+  elif [[ $1 == env && ( $2 == use || $2 == off ) ]]; then
+    # Only the shell can change this terminal's environment (ADR 0034).
+    ALI_WRAPPER=1 \command ali "$@"
+    if (( $? == 0 )); then
+      \local _e=${${(@)@[3,-1]:#-*}[1]}
+      if [[ $2 == off || ${@[(Ie)--global]} -gt 0 ]]; then
+        \unset ALI_ENV
+      elif [[ $_e =~ '^[a-z][a-z0-9_-]*$' ]]; then
+        \export ALI_ENV=$_e
+      fi
+      \true
+    else
+      \false
+    fi
   elif [[ $1 == add && -n $2 ]]; then
     \local _d=
     if (( ${+aliases[$2]} && ! ${_ali_names[(Ie)$2]} )); then _d="alias"$'\t'"${aliases[$2]}"

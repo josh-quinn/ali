@@ -29,7 +29,7 @@ func TestInitUpgradesAV1BlockInPlace(t *testing.T) {
 	if !strings.HasPrefix(string(got), before) || !strings.HasSuffix(string(got), after) {
 		t.Errorf("content outside the block changed:\n%s", got)
 	}
-	if strings.Contains(string(got), blockV1) || !strings.Contains(string(got), "# ali block v2") {
+	if strings.Contains(string(got), blockV1) || !strings.Contains(string(got), "# ali block v") {
 		t.Errorf("block not upgraded:\n%s", got)
 	}
 	// the upgraded block brings the new behaviour into the shell

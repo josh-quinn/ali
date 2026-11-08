@@ -239,7 +239,7 @@ func (s *Store) Update(fn func(*Data) error) error {
 	if err := WriteAtomic(s.File(), body, 0o600); err != nil {
 		return err
 	}
-	return WriteAtomic(s.ZshFile(), []byte(render.Render(d.RenderInput())), 0o600)
+	return WriteAtomic(s.ZshFile(), []byte(render.Render(s.RenderInput(d))), 0o600)
 }
 
 // WriteAtomic writes data to path atomically, following symlinks (see fsx).

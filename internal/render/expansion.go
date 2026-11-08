@@ -11,10 +11,13 @@ import (
 
 // Input is everything aliases.zsh is generated from.
 type Input struct {
-	Aliases []alias.Alias
-	Subs    map[string]map[string]string // tool -> sub-alias -> expansion
-	Shared  map[string]string
-	Vars    []string // defined variable names
+	Aliases   []alias.Alias
+	Subs      map[string]map[string]string // tool -> sub-alias -> expansion
+	Shared    map[string]string
+	Vars      []string // defined variable names
+	Envs      []string // environment names
+	Protected []string // protected environment names
+	PromptOff bool     // settings: prompt = off
 }
 
 // Render produces aliases.zsh: the aliases (Zsh), plus, only when sub-aliases
@@ -22,7 +25,7 @@ type Input struct {
 // expansion (ADRs 0030, 0035). Users with plain aliases get exactly Zsh's output.
 func Render(in Input) string {
 	plain, funcs := Split(in)
-	out := Zsh(plain) + functionsCode(funcs)
+	out := Zsh(plain) + functionsCode(funcs) + envCode(in)
 	trigger, subw := gateTables(in)
 	if len(trigger) == 0 {
 		return out
@@ -81,6 +84,23 @@ func functionsCode(funcs []alias.Alias) string {
 		b.WriteString("functions[" + a.Name + "]=" + Quote(body) + "\n")
 	}
 	return b.String()
+}
+
+// envCode tells the prompt hook which environments are protected and whether
+// the indicator is off. Nothing is emitted for users without environments.
+func envCode(in Input) string {
+	if len(in.Envs) == 0 && !in.PromptOff {
+		return ""
+	}
+	prot := map[string]bool{}
+	for _, p := range in.Protected {
+		prot[p] = true
+	}
+	s := "\\typeset -gA _ali_protected\n_ali_protected=(" + assocOnes(prot) + ")\n"
+	if in.PromptOff {
+		return s + "_ali_prompt_off=1\n"
+	}
+	return s + "\\unset _ali_prompt_off\n"
 }
 
 // gateTables computes, for the zsh side, which first words can start a line ali

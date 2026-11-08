@@ -6,6 +6,7 @@ import (
 
 	"github.com/josh-quinn/ali/internal/model"
 	"github.com/josh-quinn/ali/internal/render"
+	"github.com/josh-quinn/ali/internal/settings"
 )
 
 // Feature 003 tables (data-model.md). They are written only when used, and
@@ -95,13 +96,24 @@ func (d *Data) DeleteEnv(name string) bool {
 	return ok
 }
 
-// RenderInput collects what aliases.zsh is generated from.
-func (d *Data) RenderInput() render.Input {
+// RenderInput collects what aliases.zsh is generated from, including the
+// machine-local settings that affect it.
+func (s *Store) RenderInput(d *Data) render.Input {
 	subs := map[string]map[string]string{}
 	for tool := range d.x.subs {
 		subs[tool] = d.Subs(tool)
 	}
-	return render.Input{Aliases: d.All(), Subs: subs, Shared: d.Shared(), Vars: d.VarNames()}
+	in := render.Input{Aliases: d.All(), Subs: subs, Shared: d.Shared(), Vars: d.VarNames(), Envs: d.EnvNames()}
+	for _, n := range in.Envs {
+		if e := d.x.envs[n]; e.Protected {
+			in.Protected = append(in.Protected, n)
+		}
+	}
+	// A broken settings file must not stop aliases being written; defaults apply
+	// and "ali config" reports the problem.
+	st, _ := settings.Load(s.Dir)
+	in.PromptOff = st.Prompt == settings.PromptOff
+	return in
 }
 
 // UsesOf lists what references variable name: "alias X", "sub TOOL X",
