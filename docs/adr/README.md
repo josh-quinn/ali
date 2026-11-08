@@ -31,7 +31,7 @@ as the change it records.
 | [0023](0023-write-through-symlinks-instead-of-replacing-them.md) | Write through symlinks instead of replacing them | Accepted |
 | [0024](0024-refuse-to-guess-locations-when-home-is-unset.md) | Refuse to guess locations when HOME is unset | Accepted |
 | [0025](0025-escape-control-characters-when-printing-stored-text-and-reject-nul.md) | Escape control characters when printing stored text and reject NUL | Accepted |
-| [0026](0026-harden-ci-and-keep-dependencies-patched.md) | Harden CI and keep dependencies patched | Accepted |
+| [0026](0026-harden-ci-and-keep-dependencies-patched.md) | Harden CI and keep dependencies patched | Superseded by [0040](0040-gate-every-change-with-free-open-source-quality-and-security-checks.md) |
 | [0027](0027-learn-about-the-live-shell-through-the-wrapper.md) | Learn about the live shell through the wrapper | Accepted |
 | [0028](0028-remember-overridden-aliases-in-the-shell-session.md) | Remember overridden aliases in the shell session | Accepted |
 | [0029](0029-upgrade-the-managed-block-in-place.md) | Upgrade the managed block in place | Accepted |
@@ -45,3 +45,4 @@ as the change it records.
 | [0037](0037-store-format-v2-only-when-used-with-machine-local-settings-kept-separate.md) | Store format v2 only when used, with machine-local settings kept separate | Accepted |
 | [0038](0038-generate-help-and-man-pages-from-the-command-tree.md) | Generate help and man pages from the command tree | Accepted |
 | [0039](0039-distribute-with-a-homebrew-cask-built-by-goreleaser.md) | Distribute with a Homebrew cask built by GoReleaser | Accepted |
+| [0040](0040-gate-every-change-with-free-open-source-quality-and-security-checks.md) | Gate every change with free, open-source quality and security checks | Accepted |

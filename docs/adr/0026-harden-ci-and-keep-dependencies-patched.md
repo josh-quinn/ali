@@ -1,6 +1,6 @@
 # 0026. Harden CI and keep dependencies patched
 
-- **Status**: Accepted
+- **Status**: Superseded by [0040](0040-gate-every-change-with-free-open-source-quality-and-security-checks.md)
 - **Date**: 2026-11-08
 - **Spec**: Security audit 2026-11-08
 
