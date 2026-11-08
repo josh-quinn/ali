@@ -122,6 +122,8 @@ func word(s string) (val, rest string, err error) {
 			i += 2
 		case c == '$' || c == '`':
 			return "", "", fmt.Errorf("unquoted expansion ($ or backtick) is not supported")
+		case strings.IndexByte(";&|<>()", c) >= 0:
+			return "", "", fmt.Errorf("unquoted %q ends the alias definition in zsh (quote it or write it by hand)", c)
 		default:
 			b.WriteByte(c)
 			i++

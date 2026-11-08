@@ -61,3 +61,23 @@ func TestLineNumbers(t *testing.T) {
 		t.Errorf("%+v", r.Entries)
 	}
 }
+
+// In `alias a=b;c` zsh defines alias a=b and then *runs* c. Importing "b;c" as the
+// alias value would misrepresent the file.
+func TestUnquotedShellMetacharactersAreNotImported(t *testing.T) {
+	lines := []string{"alias a=b;c", "alias d=e&&f", "alias p=a|b", "alias r=a>f", "alias s=a<f", "alias t=(x)", "alias u=a&"}
+	for _, l := range lines {
+		r := Parse(l + "\n")
+		if len(r.Entries) != 0 || len(r.Skipped) != 1 {
+			t.Errorf("%q: entries=%v skipped=%v", l, r.Entries, r.Skipped)
+		}
+	}
+	// the same characters inside quotes are ordinary text
+	r := Parse("alias ok='a;b && c | d > e'\nalias ok2=\"x;y\"\nalias ok3=a\\;b\n")
+	if len(r.Entries) != 3 {
+		t.Fatalf("quoted/escaped metacharacters should import: %+v %+v", r.Entries, r.Skipped)
+	}
+	if r.Entries[0].Command != "a;b && c | d > e" || r.Entries[2].Command != "a;b" {
+		t.Errorf("wrong values: %+v", r.Entries)
+	}
+}
