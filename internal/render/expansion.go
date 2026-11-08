@@ -196,15 +196,18 @@ const tabWidget = `_ali_tab() {
       \return
     fi
   fi
-  \zle _ali_orig_$WIDGET
+  \zle _ali_orig_$1
 }
 _ali_menu_fn() { \compadd -Q -- $_ali_cands; }
 # Wrap the completion widgets themselves (not the Tab key), so whatever Tab is
 # bound to keeps working and no subshell is needed to find out what that is.
+# Each wrapper names its original explicitly: $WIDGET would name the outer
+# widget when a plugin (e.g. fzf) calls "zle expand-or-complete" from its own.
 for _ali_w in expand-or-complete complete-word menu-complete menu-expand-or-complete expand-or-complete-prefix; do
   if (( ${+widgets[$_ali_w]} && ! ${+widgets[_ali_orig_$_ali_w]} )); then
     \zle -A $_ali_w _ali_orig_$_ali_w
-    \zle -N $_ali_w _ali_tab
+    functions[_ali_tab_$_ali_w]="_ali_tab $_ali_w"
+    \zle -N $_ali_w _ali_tab_$_ali_w
   fi
 done
 \unset _ali_w
@@ -219,7 +222,7 @@ _ali_space() {
     _r=("${(@0)$(\command ali expand --zle space -- "$LBUFFER" 2>/dev/null)}")
     [[ $_r[1] == ok ]] && LBUFFER=$_r[2]
   fi
-  \zle _ali_orig_$WIDGET
+  \zle _ali_orig_$1
 }
 _ali_accept() {
   if [[ -n $_ali_pending && $BUFFER == "$_ali_pending" ]]; then
@@ -260,7 +263,8 @@ fi
 for _ali_w in self-insert magic-space; do
   if (( ! ${+widgets[_ali_orig_$_ali_w]} )); then
     \zle -A $_ali_w _ali_orig_$_ali_w
-    \zle -N $_ali_w _ali_space
+    functions[_ali_space_$_ali_w]="_ali_space $_ali_w"
+    \zle -N $_ali_w _ali_space_$_ali_w
   fi
 done
 \unset _ali_w
