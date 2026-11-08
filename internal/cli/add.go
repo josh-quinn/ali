@@ -6,6 +6,7 @@ import (
 	"github.com/josh-quinn/ali/internal/alias"
 	"github.com/josh-quinn/ali/internal/group"
 	"github.com/josh-quinn/ali/internal/shadow"
+	"github.com/josh-quinn/ali/internal/shelldef"
 	"github.com/josh-quinn/ali/internal/store"
 	"github.com/spf13/cobra"
 )
@@ -53,6 +54,12 @@ prints a warning and still creates the alias.`,
 					return fmt.Errorf("alias %s already exists in group %s (%s); use `ali update %s <command>` or --force", name, prev.Group, display(prev.Command), name)
 				}
 				if !exists {
+					switch def := shelldef.FromEnv(); def.Kind {
+					case shelldef.Alias:
+						fmt.Fprintf(a.err, "warning: %s is already an alias in this shell (%s); ali's alias will take precedence\n", name, display(def.Text))
+					case shelldef.Function:
+						fmt.Fprintf(a.err, "warning: %s is a shell function; ali's alias will take precedence\n", name)
+					}
 					if what := shadow.Shadows(name); what != "" {
 						fmt.Fprintf(a.err, "warning: %s shadows %s\n", name, what)
 					}

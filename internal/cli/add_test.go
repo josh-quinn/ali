@@ -122,3 +122,37 @@ func TestAddRejectsReservedNames(t *testing.T) {
 		}
 	}
 }
+
+func TestAddWarnsWhenOverridingLiveShellAliasOrFunction(t *testing.T) {
+	e := newEnv(t)
+	t.Setenv("ALI_SHELL_DEF", "alias\tgit push")
+	_, errs, err := e.run("add", "gp", "git pull")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "warning: gp is already an alias in this shell (git push); ali's alias will take precedence"; !strings.Contains(errs, want) {
+		t.Errorf("stderr %q, want %q", errs, want)
+	}
+
+	t.Setenv("ALI_SHELL_DEF", "function")
+	_, errs, _ = e.run("add", "mk", "make")
+	if want := "warning: mk is a shell function; ali's alias will take precedence"; !strings.Contains(errs, want) {
+		t.Errorf("stderr %q, want %q", errs, want)
+	}
+
+	// updating an alias ali already owns never warns about the shell
+	t.Setenv("ALI_SHELL_DEF", "alias\tsomething")
+	_, errs, _ = e.run("add", "gp", "git pull -r", "--force")
+	if strings.Contains(errs, "already an alias in this shell") {
+		t.Errorf("warned for ali's own alias: %q", errs)
+	}
+}
+
+func TestAddShellWarningSanitisesText(t *testing.T) {
+	e := newEnv(t)
+	t.Setenv("ALI_SHELL_DEF", "alias\techo \x1b[2J")
+	_, errs, _ := e.run("add", "zz", "x")
+	if strings.ContainsRune(errs, '\x1b') {
+		t.Errorf("escape leaked: %q", errs)
+	}
+}

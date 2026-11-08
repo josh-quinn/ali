@@ -21,7 +21,7 @@ description: "Task list for Oh My Zsh compatibility"
 ## Phase 3: US1 Warn on overriding shell aliases/functions (P1) 🎯 MVP
 - [x] T004 [P] [US1] Tests then `internal/shelldef`: parse `ALI_SHELL_DEF` (alias/function/empty, malformed → ignored)
 - [x] T005 [US1] Tests then `internal/render`: wrapper sets `ALI_SHELL_DEF` for `add` only, excluding ali-owned names
-- [ ] T006 [US1] Tests then `internal/cli/add.go`: print override warning (FR-001..003)
+- [x] T006 [US1] Tests then `internal/cli/add.go`: print override warning (FR-001..003)
 - [ ] T007 [US1] E2E `tests/e2e/omz_test.go`: plugin-like alias and function defined before the block → warnings, aliases created
 
 ## Phase 4: US2 Restore originals on removal (P1)
