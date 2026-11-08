@@ -19,7 +19,10 @@ zpty -b z zsh -i -d
 zpty -w -n z $'PROMPT=""\r'
 sleep 0.2
 zpty -r -t z _junk
-zpty -w -n z "$(<$1)"
+zmodload zsh/zselect
+keys="$(<$1)"
+# type one key at a time, like a person; a burst would look like a paste
+for (( i = 1; i <= $#keys; i++ )); do zpty -w -n z "${keys[i]}"; zselect -t 1; done
 zpty -w -n z $'\rprint -r -- __ALI_DO""NE__\r'
 zpty -r z out '*__ALI_DONE__*' && print -rn -- "$out"
 zpty -d z
@@ -54,11 +57,12 @@ func (s *sandbox) zle(keys string) string {
 
 func TestZleDriverSelfTest(t *testing.T) {
 	s := newSandbox(t)
-	got := s.zle("echo hel\"\"lo\rfc -ln -2 -2\r")
+	got := s.zle("echo hel\"\"lo\rfc -ln -1 -1\r")
 	if !hasLine(got, "hello") {
 		t.Errorf("command output missing:\n%q", got)
 	}
-	if !strings.Contains(got, `echo hel""lo`) {
-		t.Errorf("typed line / history not visible:\n%q", got)
+	// an exact line (not the redrawn typed text) can only come from fc's output
+	if !hasLine(got, `echo hel""lo`) {
+		t.Errorf("history output missing:\n%q", got)
 	}
 }
