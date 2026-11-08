@@ -26,6 +26,11 @@ Resolved during clarification (recommended options):
 - Q: Do plain aliases without sub-aliases or placeholders now expand in the command line? → A: No. They keep behaving as zsh aliases (FR-017); the command line expands only when a sub-alias, placeholder or `@` word is involved.
 - Q: How do I use another environment for just one command? → A: `@@name` in the line (FR-008).
 
+Owner review of the plan (approved with comments):
+
+- Q: Does `k get p` leave `p` literal because `get` is not a sub-alias? → A: It did in the draft; changed. Sub-aliases expand anywhere after the tool, and users type `\p` when they need a literal (FR-003, ADR 0031). A bare `--` still ends expansion, since what follows belongs to another program.
+- Q: Documentation? → A: Help with examples for every command, help topics for typed syntax, and generated man pages (FR-019; feature 002 FR-008 covers existing commands).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Tool-scoped sub-aliases, expanded as I type (Priority: P1)
@@ -40,10 +45,11 @@ I define short words that only mean something after a given tool: under kubectl,
 
 1. **Given** the subs above, **When** I type `k g p` followed by a space, **Then** the command line reads `kubectl get pods ` before I press Enter.
 2. **Given** a shared sub `g` = `grep` and a kubectl sub `g` = `get`, **When** I type `k g`, **Then** it becomes `kubectl get` (tool wins).
-3. **Given** the same subs, **When** I type `k logs mypod p`, **Then** `p` stays `p` (expansion stops at the first word that is not a sub-alias).
-4. **Given** the same subs, **When** I type `k g \p`, **Then** the result is `kubectl get p` (backslash keeps a word literal).
-5. **Given** I press Enter without typing a space after the last word, **Then** the line is still fully expanded before it runs, and history records the expanded command.
-6. **Given** a line that uses no ali alias or sub (e.g. `ls -la`), **When** I type it, **Then** nothing about typing or running it changes.
+3. **Given** the same subs, **When** I type `k get p` or `k logs mypod p`, **Then** `p` expands to `pods` (sub-aliases expand anywhere after the tool, even after words that are not sub-aliases).
+4. **Given** the same subs, **When** I type `k logs \p`, **Then** the result is `kubectl logs p` (backslash keeps a word literal, e.g. for a pod named `p`).
+5. **Given** the same subs, **When** I type `k exec mypod -- g`, **Then** `g` stays `g` (a bare `--` ends sub-alias expansion for that command).
+6. **Given** I press Enter without typing a space after the last word, **Then** the line is still fully expanded before it runs, and history records the expanded command.
+7. **Given** a line that uses no ali alias or sub (e.g. `ls -la`), **When** I type it, **Then** nothing about typing or running it changes.
 
 ---
 
@@ -142,7 +148,7 @@ I can see everything available for a tool in one place and get tab completion fo
 
 - **FR-001**: Users MUST be able to add, list, update and remove sub-aliases scoped to a tool, and shared sub-aliases usable under any tool.
 - **FR-002**: The tool for a line MUST be determined from its first word after expanding an ali alias and skipping wrappers, so `k`, `kubectl` and any other alias that runs kubectl share kubectl's sub-aliases.
-- **FR-003**: After the tool, consecutive words that are sub-aliases MUST expand (tool's own first, then shared); expansion MUST stop at the first word that is not one; a leading backslash MUST keep a word literal; quoted words MUST never expand.
+- **FR-003**: After the tool, every plain unquoted word that names a sub-alias MUST expand (tool's own first, then shared), regardless of its position or of non-sub-alias words before it; a leading backslash MUST keep a word literal; quoted words MUST never expand; a bare `--` MUST end sub-alias expansion for the rest of that command.
 - **FR-004**: By default, expansion MUST be shown in the command line before the command runs (on Space after a sub-alias, and fully on Enter), and history MUST record the expanded command.
 - **FR-005**: A setting MUST switch to run-time expansion, where the typed line is unchanged and expansion happens when the command runs; run-time mode applies to lines that start with an ali alias.
 - **FR-006**: Aliases and sub-alias expansions MAY contain named placeholders `{{name}}`; a placeholder MUST only be recognised when `name` is a defined variable; placeholders inside quotes MUST be rejected at save time.
@@ -157,6 +163,7 @@ I can see everything available for a tool in one place and get tab completion fo
 - **FR-015**: `ali expand '<line>'` MUST print what a line would become, without running it.
 - **FR-016**: `ali show <tool>` MUST list the tool's aliases, sub-aliases, applicable shared sub-aliases and referenced variables; tab completion MUST offer sub-aliases after a tool and `@` values when placeholders are present.
 - **FR-017**: Lines that use no ali alias, sub-alias or placeholder MUST behave exactly as before.
+- **FR-019**: Every new command MUST have a summary, description and example in `--help` and a generated man page; help topics MUST explain the typed syntax: `ali help expansion` (sub-aliases, `\\word`, `--`, visible vs run-time), `ali help placeholders` (`{{name}}`, `@key`, `@var=value`) and `ali help environments` (`@@env`, terminal vs global, protection, prompt) (Constitution v1.2.0, ADR 0038).
 - **FR-018**: All new definitions MUST be stored in the same human-editable store as aliases, except machine-local settings (expansion mode, global environment, prompt indicator), which MUST NOT be synced with the store.
 
 ### Key Entities
@@ -177,6 +184,7 @@ I can see everything available for a tool in one place and get tab completion fo
 - **SC-005**: Switching environment in one terminal never changes the resolved command in another terminal that has its own choice.
 - **SC-006**: A user can find every value for a variable, and everything usable after a tool, with one command each.
 - **SC-007**: Existing aliases from feature 001 work unchanged after upgrading.
+- **SC-008**: Every new command and every typed syntax element is documented in `--help`/`ali help <topic>` and in a man page; the help completeness test passes.
 
 ## Assumptions
 

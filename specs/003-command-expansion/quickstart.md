@@ -18,7 +18,10 @@ ali env add dev ns=one; ali env add prod ns=prod --protect
 | `k g p n` | `-n namespace-1` (default) |
 | `ali env use prod` then `k g p n` | first Enter shows `kubectl get pods -n prod` + protected notice; second Enter runs; prompt shows `prod` in red |
 | second terminal | still default; `ali env use --global dev` → both follow `dev` except a terminal with its own choice |
-| `k logs mypod p` | `p` not expanded |
+| `k get p` / `k logs mypod p` | `p` expands to `pods` |
+| `k logs \p` | stays `kubectl logs p` |
+| `k exec mypod -- g` | `g` not expanded after `--` |
+| `ali help expansion`, `man ali-sub` | documented with examples |
 | `npm i @types/node` | untouched, no process spawned (check with a counter in the test) |
 | `k g p n @ns='a b; rm -rf ~'` | argument reaches kubectl as one literal word |
 | `ali config set expand runtime`; `k g p n @sys` | line unchanged while typing; same command runs |

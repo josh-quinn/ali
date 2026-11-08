@@ -10,7 +10,7 @@ description: "Task list for command expansion"
 **Tests**: required and written first; each task is one green conventional commit including its tests and any ADR status change.
 
 ## Phase 1: Setup
-- [ ] T001 Mark ADRs 0030-0037 Accepted once the owner approves this plan
+- [x] T001 Mark ADRs 0030-0037 Accepted once the owner approves this plan
 - [ ] T002 [P] `tests/e2e/zle/`: zpty driver helper (send keys, read line, tolerate bracketed-paste escapes) with a self-test (research R10)
 
 ## Phase 2: Foundational (blocks all stories)
@@ -21,11 +21,11 @@ description: "Task list for command expansion"
 - [ ] T007 Tests then `internal/expand` value quoting (research R7) incl. hostile-value table (SC-004)
 
 ## Phase 3: US1 Tool-scoped sub-aliases, visible expansion (P1) 🎯 MVP
-- [ ] T008 [US1] Tests then `internal/expand`: tool detection through aliases and wrappers; leading-run sub expansion; tool-over-shared; `\word`; no recursion
+- [ ] T008 [US1] Tests then `internal/expand`: tool detection through aliases and wrappers; sub-alias expansion anywhere after the tool (`k get p`, `k logs x p`); tool-over-shared; `\word`; bare `--` ends expansion; per-command scoping across `;`/`|`/`&&`; no recursion
 - [ ] T009 [P] [US1] Tests then `internal/cli/sub.go` (add/update/rm/ls, `--shared`, `--json`)
 - [ ] T010 [US1] Tests then `internal/cli/expand.go` (`ali expand '<line>'` and `--zle` protocol, research R4)
 - [ ] T011 [US1] Tests then `internal/render`: `_ali_trigger` and sub-name gate tables; Space and Enter widgets chaining to previous widgets; paste skipped (research R2, R3)
-- [ ] T012 [US1] E2E (zpty): `k g p ` shows `kubectl get pods `; Enter without space expands; history text; `kubectl g p`; `k logs x p`; plain `ls` spawns no process
+- [ ] T012 [US1] E2E (zpty): `k g p ` shows `kubectl get pods `; `k get p ` expands `p`; `k logs \p` stays literal; Enter without space expands; history text; `kubectl g p`; plain `ls` spawns no process
 
 ## Phase 4: US2 Placeholders and @ values (P1)
 - [ ] T013 [US2] Tests then `internal/expand`: placeholder parsing (defined variables only), `@key`, `@var=value`, ambiguity error, unmatched `@` words left alone, same value for repeated placeholders
@@ -50,6 +50,10 @@ description: "Task list for command expansion"
 - [ ] T026 [P] [US5] Tests then `internal/cli/show.go`
 - [ ] T027 [US5] Tests then generated completion for ali commands and Tab widget for `@` values and sub-aliases, falling through otherwise (research R11)
 - [ ] T028 [US5] E2E (zpty): `@<TAB>` offers `one sys`; `k <TAB>` offers kubectl sub-aliases
+
+## Documentation (applies to every CLI task above)
+Each CLI task (T009, T010, T014, T019, T023, T026) includes Short, Long and Example help, enforced by the help completeness test from feature 002 (T019 there); man pages regenerate automatically.
+- [ ] T033 [P] Help topics `expansion`, `placeholders`, `environments` with examples; man pages generated for them (FR-019)
 
 ## Phase 8: Polish
 - [ ] T029 [P] README: sub-aliases, placeholders, environments, settings; update Platform support/limitations
