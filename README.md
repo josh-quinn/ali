@@ -22,6 +22,14 @@ helm
   hgp  helm get pods
 ```
 
+And beyond plain aliases, short words that expand after a tool, with values you pick:
+
+```console
+$ ali sub add kubectl g get; ali sub add kubectl p pods; ali sub add kubectl n '-n {{ns}}'
+$ ali var add ns dev=dev-ns sys=kube-system --default dev
+$ k g p n @sys        # press Enter: the line becomes "kubectl get pods -n kube-system"
+```
+
 ## Why
 
 You type a command that doesn't exist, the terminal says `command not found`, so you
@@ -48,7 +56,7 @@ Pick one:
 
 | Method | Command | Notes |
 |---|---|---|
-| Homebrew | `brew install --cask josh-quinn/tap/ali` | From the first tagged release. Installs the man pages too. |
+| Homebrew | `brew install --cask josh-quinn/tap/ali` | Available once the first version is tagged (not yet). Installs the man pages too. |
 | Go | `go install github.com/josh-quinn/ali/cmd/ali@latest` | Puts `ali` in `$(go env GOPATH)/bin`, usually `~/go/bin`. |
 | From source | `git clone https://github.com/josh-quinn/ali && cd ali && make build` | Produces `./ali`; copy it somewhere on your `PATH`, e.g. `cp ali ~/.local/bin/`. `make man` builds the man pages into `man/`. |
 
@@ -187,6 +195,7 @@ ali doctor        # "block up to date" should say ok
 | `ali show TOOL` | Everything usable with a tool: aliases, sub-aliases, variables. |
 | `ali expand 'LINE'` | Print what a line expands to, without running it. |
 | `ali config get\|set\|ls` | This machine's settings: `expand` (inline/runtime), `prompt` (right/off). |
+| `ali help TOPIC` | Guides for what you type in the shell: `expansion`, `placeholders`, `environments`, and `files`. |
 
 Errors go to stderr with a non-zero exit code; `--json` makes listings scriptable.
 
@@ -261,22 +270,45 @@ both define a name.
 
 ## How it works
 
-- Your aliases live in `~/.config/ali/aliases.toml` (or `$XDG_CONFIG_HOME/ali/`), one
-  table per group. It's plain TOML: edit it, diff it, keep it in your dotfiles.
+- Everything you define lives in `~/.config/ali/aliases.toml` (or
+  `$XDG_CONFIG_HOME/ali/`): aliases in one table per group, plus `_subs`, `_shared`,
+  `_vars` and `_envs` tables once you use those features. It's plain TOML: edit it,
+  diff it, keep it in your dotfiles.
   ```toml
-  version = 1
+  version = 2
 
   [helm]
   hgp = "helm get pods"
+
+  [_subs.kubectl]
+  g = "get"
+  n = "-n {{ns}}"
+
+  [_vars.ns]
+  default = "dev"
+  [_vars.ns.values]
+  dev = "dev-ns"
   ```
-- `ali` renders `aliases.zsh` from that file. The block in `.zshrc` just `source`s it,
-  so opening a terminal never launches `ali` (startup cost is a few milliseconds).
-- A program can't change its parent shell, so the block also defines a tiny `ali()`
-  wrapper that re-sources `aliases.zsh` after each run. That's why changes are live
-  immediately. `ali` only unaliases names it defined itself; your own aliases are never touched.
-- Writes are atomic and file-locked, and a hand-broken `aliases.toml` is reported with
-  its location rather than overwritten.
-- The only commands that touch `.zshrc` are `init` and `import`, and both back it up first.
+  The file stays `version = 1` until you use sub-aliases, variables or environments,
+  so older versions of ali keep reading it.
+- `ali` renders `aliases.zsh` from that file on every change. The block in `.zshrc`
+  only `source`s it, so opening a terminal never launches the `ali` program.
+- A program can't change its parent shell, so the block also defines a small `ali()`
+  shell function that reloads `aliases.zsh` after each command. That's why changes
+  are live immediately. ali only unaliases names it defined itself; your own aliases
+  are never touched.
+- Expansion while you type comes from small zsh line-editor widgets in `aliases.zsh`.
+  They check, inside zsh, whether a line can involve an ali expansion and only then
+  ask `ali expand` (about 5 ms). Ordinary typing never starts a process. They wrap
+  zsh's own widgets rather than rebinding keys, so plugins such as Oh My Zsh and fzf
+  keep their bindings.
+- An alias containing a placeholder is defined as a small function, so it still
+  expands correctly where the line editor is not involved.
+- Writes are atomic and file-locked, files are private (`0700`/`0600`), symlinks are
+  followed, and a hand-broken `aliases.toml` is reported with its location rather
+  than overwritten.
+- `ali init` is the only command that changes `.zshrc`, and it backs it up first.
+  `ali import` only reads it.
 
 ## Platform support
 
