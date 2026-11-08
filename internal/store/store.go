@@ -219,9 +219,32 @@ func (s *Store) Update(fn func(*Data) error) error {
 	return WriteAtomic(s.ZshFile(), []byte(render.Zsh(d.All())), 0o600)
 }
 
+// resolve follows symlinks so a symlinked file (stow, chezmoi, a dotfiles repo)
+// is updated in place instead of being replaced by a regular file. A dangling
+// symlink resolves to where it points, so the target gets created.
+func resolve(path string) string {
+	for i := 0; i < 16; i++ {
+		fi, err := os.Lstat(path)
+		if err != nil || fi.Mode()&os.ModeSymlink == 0 {
+			return path
+		}
+		next, err := os.Readlink(path)
+		if err != nil {
+			return path
+		}
+		if !filepath.IsAbs(next) {
+			next = filepath.Join(filepath.Dir(path), next)
+		}
+		path = next
+	}
+	return path
+}
+
 // WriteAtomic writes data to path via a temp file in the same directory,
-// fsyncs, then renames, so readers never see a partial file.
+// fsyncs, then renames, so readers never see a partial file. Symlinks are
+// followed (see resolve).
 func WriteAtomic(path string, data []byte, perm os.FileMode) error {
+	path = resolve(path)
 	tmp, err := os.CreateTemp(filepath.Dir(path), "."+filepath.Base(path)+".tmp*")
 	if err != nil {
 		return err

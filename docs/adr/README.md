@@ -28,3 +28,4 @@ as the change it records.
 | [0020](0020-test-end-to-end-through-a-line-fed-interactive-zsh.md) | Test end to end through a line-fed interactive zsh | Accepted |
 | [0021](0021-reserve-names-the-shell-integration-relies-on-and-escape-its-builtins.md) | Reserve names the shell integration relies on and escape its builtins | Accepted |
 | [0022](0022-keep-the-config-directory-and-its-files-private.md) | Keep the config directory and its files private | Accepted |
+| [0023](0023-write-through-symlinks-instead-of-replacing-them.md) | Write through symlinks instead of replacing them | Accepted |

@@ -83,3 +83,24 @@ func TestBackupOf(t *testing.T) {
 		t.Errorf("backup mode %v", st.Mode())
 	}
 }
+
+// Dotfile managers (stow, chezmoi, yadm) symlink .zshrc into a repo.
+func TestInstallKeepsSymlinkedZshrc(t *testing.T) {
+	dir := t.TempDir()
+	target := filepath.Join(dir, "dotfiles", "zshrc")
+	os.MkdirAll(filepath.Dir(target), 0o755)
+	os.WriteFile(target, []byte("export A=1\n"), 0o644)
+	rc := filepath.Join(dir, ".zshrc")
+	os.Symlink(target, rc)
+
+	res, err := Install(rc)
+	if err != nil || !res.Changed {
+		t.Fatalf("%+v %v", res, err)
+	}
+	if st, _ := os.Lstat(rc); st.Mode()&os.ModeSymlink == 0 {
+		t.Error(".zshrc symlink was replaced by a regular file")
+	}
+	if b, _ := os.ReadFile(target); !strings.Contains(string(b), render.BlockStart) {
+		t.Errorf("block not written into the symlink target:\n%s", b)
+	}
+}
