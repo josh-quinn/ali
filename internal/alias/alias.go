@@ -22,6 +22,14 @@ var (
 // reservedGroups are top-level keys in the store file and cannot be groups.
 var reservedGroups = map[string]bool{"version": true, "_pinned": true}
 
+// reservedNames are words the generated shell code and the .zshrc wrapper rely
+// on. Aliasing them could hijack that code (see ADR 0021).
+var reservedNames = map[string]bool{
+	"ali": true, "alias": true, "unalias": true, "builtin": true, "command": true,
+	"source": true, "local": true, "return": true, "unset": true,
+	"for": true, "do": true, "done": true,
+}
+
 // ValidateName reports why name is not a usable alias name.
 func ValidateName(name string) error {
 	switch {
@@ -29,6 +37,8 @@ func ValidateName(name string) error {
 		return fmt.Errorf("alias name must not be empty")
 	case len(name) > 64:
 		return fmt.Errorf("alias name %q is longer than 64 characters", name)
+	case reservedNames[name]:
+		return fmt.Errorf("alias name %q is reserved: ali's shell integration relies on it", name)
 	case name == ".":
 		return fmt.Errorf("alias name %q is not allowed", name)
 	case !nameRe.MatchString(name):

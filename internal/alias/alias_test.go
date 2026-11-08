@@ -1,6 +1,9 @@
 package alias
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestValidateName(t *testing.T) {
 	good := []string{"gp", "k", "git-pull", "a.b", "_x", "g@2", "ls+", "A1"}
@@ -39,5 +42,14 @@ func TestValidateCommand(t *testing.T) {
 	}
 	if err := ValidateCommand("echo 'hi' && ls\nfoo"); err != nil {
 		t.Errorf("complex command rejected: %v", err)
+	}
+}
+
+func TestValidateNameRejectsWordsTheShellBlockRelaysOn(t *testing.T) {
+	for _, n := range []string{"ali", "alias", "unalias", "builtin", "command", "source", "local", "return", "for", "do", "done", "unset"} {
+		err := ValidateName(n)
+		if err == nil || !strings.Contains(err.Error(), "reserved") {
+			t.Errorf("ValidateName(%q) = %v, want reserved error", n, err)
+		}
 	}
 }

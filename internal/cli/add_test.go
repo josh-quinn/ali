@@ -113,3 +113,12 @@ func TestBrokenStoreIsReportedNotOverwritten(t *testing.T) {
 		t.Error("ls on broken store should fail")
 	}
 }
+
+func TestAddRejectsReservedNames(t *testing.T) {
+	e := newEnv(t)
+	for _, n := range []string{"ali", "command", "source", "alias"} {
+		if _, _, err := e.run("add", n, "echo x"); err == nil {
+			t.Errorf("add %s should be rejected", n)
+		}
+	}
+}

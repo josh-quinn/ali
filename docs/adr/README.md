@@ -26,3 +26,4 @@ as the change it records.
 | [0018](0018-back-up-user-files-before-changing-them.md) | Back up user files before changing them | Accepted |
 | [0019](0019-limit-v1-scope-to-aliases-on-zsh-macos-first.md) | Limit v1 scope to aliases on zsh (macOS first) | Accepted |
 | [0020](0020-test-end-to-end-through-a-line-fed-interactive-zsh.md) | Test end to end through a line-fed interactive zsh | Accepted |
+| [0021](0021-reserve-names-the-shell-integration-relies-on-and-escape-its-builtins.md) | Reserve names the shell integration relies on and escape its builtins | Accepted |

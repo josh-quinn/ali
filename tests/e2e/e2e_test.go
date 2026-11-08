@@ -152,3 +152,19 @@ func TestInitIsIdempotent(t *testing.T) {
 		t.Error(".zshrc changed on second init")
 	}
 }
+
+// A user alias for a builtin the ali block relies on must not hijack the wrapper.
+func TestUserAliasesOfBuiltinsDoNotHijackTheWrapper(t *testing.T) {
+	s := newSandbox(t)
+	rc := "alias command='echo HIJACK-command'\nalias source='echo HIJACK-source'\nalias local='echo HIJACK-local'\nalias return='echo HIJACK-return'\nalias unset='echo HIJACK-unset'\n"
+	os.WriteFile(filepath.Join(s.home, ".zshrc"), []byte(rc), 0o644)
+	s.ali("init", "zsh")
+	s.ali("add", "fine", "echo fine")
+	got := s.zsh("ali ls\nfine")
+	if strings.Contains(got, "HIJACK") {
+		t.Fatalf("wrapper was hijacked by user aliases:\n%s", got)
+	}
+	if !hasLine(got, "fine") {
+		t.Errorf("alias not live:\n%s", got)
+	}
+}
