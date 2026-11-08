@@ -42,7 +42,8 @@
 ## R10: Testing the line editor
 - **Decision**: Drive a real interactive zsh inside `zsh/zpty` from a test script; send keystrokes (`k g p `, Enter), read the rendered line and the command output. The Go e2e test runs that zsh script in the sandbox `HOME`.
 - **Rationale**: ZLE is inactive when stdin is not a terminal, so the line-fed approach of ADR 0020 cannot test widgets. `zpty` ships with zsh, so no new dependency.
-- **Open check**: confirm `zmodload zsh/zpty` works on the macOS system zsh and on GitHub's macOS runners.
+- **Verified 2026-11-08** (throwaway probe, not committed): on macOS system zsh 5.9, a `zpty`-driven interactive zsh with a Space widget turned `echo g x` into `echo get x` on screen and printed `get x`. Output includes bracketed-paste escape sequences, which the test matcher must tolerate.
+- **Still open**: confirm on GitHub's macOS runners (first CI run).
 
 ## R11: Tab completion (P3)
 - **Decision**: Generate a completion function into `~/.config/ali/completions/_ali` (ali's own commands) and a Tab widget that, when the current word starts with `@` in a trigger line, offers value names via `compadd`, otherwise falls through to the previously bound completion widget. Sub-aliases after a tool are offered the same way when the word is in sub-alias position.
