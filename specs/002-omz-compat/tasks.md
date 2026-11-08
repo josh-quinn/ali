@@ -26,7 +26,7 @@ description: "Task list for Oh My Zsh compatibility"
 
 ## Phase 4: US2 Restore originals on removal (P1)
 - [x] T008 [US2] Tests then `internal/render`: `_ali_prev` record/restore logic in `aliases.zsh` (research R2, incl. `zsh/parameter` check)
-- [ ] T009 [US2] E2E: add over `gp`, rm → `git push` restored in the same shell; update keeps the original remembered
+- [x] T009 [US2] E2E: add over `gp`, rm → `git push` restored in the same shell; update keeps the original remembered
 
 ## Phase 5: US4 Upgrade the block (P2)
 - [ ] T010 [US4] Tests then `internal/cli/init.go`: "updated" outcome and messages

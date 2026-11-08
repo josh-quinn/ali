@@ -38,3 +38,17 @@ func TestBinaryRunDirectlyFallsBackQuietly(t *testing.T) {
 		t.Errorf("unexpected shell warning without wrapper:\n%s", out)
 	}
 }
+
+func TestRemovingAnOverrideRestoresOhMyZshAliasInTheSameShell(t *testing.T) {
+	s := newSandbox(t)
+	os.WriteFile(filepath.Join(s.home, ".zshrc"), []byte(omzRC), 0o644)
+	s.ali("init", "zsh")
+
+	got := s.zsh("ali add gp 'echo pulled'\nali update gp 'echo rebased'\ngp\nali rm gp\nalias gp")
+	if !hasLine(got, "rebased") {
+		t.Errorf("update not live:\n%s", got)
+	}
+	if !hasLine(got, "gp='git push'") {
+		t.Errorf("Oh My Zsh's gp not restored after rm:\n%s", got)
+	}
+}
