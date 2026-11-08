@@ -53,7 +53,7 @@ description: "Task list for command expansion"
 
 ## Documentation (applies to every CLI task above)
 Each CLI task (T009, T010, T014, T019, T023, T026) includes Short, Long and Example help, enforced by the help completeness test from feature 002 (T019 there); man pages regenerate automatically.
-- [ ] T033 [P] Help topics `expansion`, `placeholders`, `environments` with examples; man pages generated for them (FR-019)
+- [x] T033 [P] Help topics `expansion`, `placeholders`, `environments` with examples; man pages generated for them (FR-019)
 
 ## Phase 8: Polish
 - [ ] T029 [P] README: sub-aliases, placeholders, environments, settings; update Platform support/limitations

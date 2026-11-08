@@ -32,5 +32,96 @@ file it reads, but never changes it.
 
 If HOME is not set and ALI_CONFIG_DIR is not given, ali refuses to run rather than
 write into the current directory.`,
+	}, {
+		Use:   "expansion",
+		Short: "How sub-aliases expand while you type",
+		Long: `Sub-aliases are short words that mean something only after a tool:
+
+  ali add k kubectl
+  ali sub add kubectl g get
+  ali sub add kubectl p pods
+  ali sub add --shared o '-o wide'
+
+Typing "k g p o" and pressing Space or Enter turns your command line into
+"kubectl get pods -o wide" before it runs, so you see exactly what will run and your
+history keeps the full command. This is the visible (inline) mode, the default.
+
+Rules:
+  - The tool is the program the line runs, found through your ali alias and
+    through sudo, env, time and VAR=value; "kubectl g p" works too.
+  - Every plain word after the tool that names a sub-alias expands, wherever it is:
+    "k get p" and "k logs mypod p" both turn p into pods.
+  - Write \p to keep a word literal (for a pod really called p). Quoted words never
+    expand, and nothing after a bare -- expands (it belongs to another program).
+  - A tool's own sub-alias wins over a shared one. Shared sub-aliases apply to
+    tools ali knows: those with sub-aliases, or that one of your aliases runs.
+  - Plain aliases with nothing to expand behave as normal zsh aliases.
+  - Expansions are not expanded again.
+
+Run-time mode keeps the line as you typed it and expands when it runs:
+
+  ali config set expand runtime
+
+In that mode only lines that start with an ali alias expand, and to keep a word
+literal write '\p' (quoted). "ali expand 'k g p'" prints any line's expansion
+without running it, in either mode.`,
+	}, {
+		Use:   "placeholders",
+		Short: "{{name}} placeholders, variables and @ values",
+		Long: `Put {{name}} in an alias or sub-alias, and define the variable's values:
+
+  ali var add ns one=namespace-1 sys=kube-system --default one
+  ali sub add kubectl n '-n {{ns}}'
+  ali add kgp 'kubectl get pods -n {{ns}}'
+
+Then pick a value on the command line with @:
+
+  k g p n @sys            kubectl get pods -n kube-system
+  k g p n                 kubectl get pods -n namespace-1   (the default)
+  k g p n @ns=my-test     kubectl get pods -n my-test        (literal text)
+  kgp @ns='a b'           kubectl get pods -n 'a b'
+
+Where a value comes from, first match wins: an @ value on the line, an @@env on the
+line, this terminal's environment, the global environment, the variable's default.
+If none applies, the command does not run and ali says which variable is missing.
+
+Details:
+  - {{name}} counts only if a variable called name exists; anything else, such as
+    a Go template's {{end}}, stays literal text.
+  - A placeholder must not be inside quotes; ali refuses to save one there.
+  - @key works when exactly one placeholder in the command has a value called key;
+    if two do, write @var=key. @ words that match no placeholder (npm i @types/node)
+    are left alone.
+  - Values are inserted as one quoted word and never run as shell code; @var=
+    values containing $ or backticks are refused.
+
+Manage variables with "ali var" (add, set, unset, default, rm, ls, show).`,
+	}, {
+		Use:   "environments",
+		Short: "Switching sets of values with environments",
+		Long: `An environment sets several variables at once:
+
+  ali env add dev  ns=one        ctx=dev-cluster
+  ali env add prod ns=production ctx=prod-cluster --protect
+
+Choose one for this terminal, or for every terminal that has not chosen its own:
+
+  ali env use prod             only this terminal
+  ali env use dev --global     all terminals (this one included)
+  ali env off                  this terminal follows the global choice again
+  ali env current              what is active here, and why
+
+Use another environment for one command with @@name:  k g p n @@dev
+
+The active environment is shown at the right of your prompt as [ali:name], in red
+when it is protected. With "ali config set prompt off" ali leaves your prompt alone;
+put $(ali_prompt_info) in your theme instead.
+
+A protected environment is for places where mistakes are expensive. When a command
+takes a value from it, ali shows the complete command and runs it only when you
+press Enter again (in run-time mode it asks on the terminal, and refuses when there
+is no terminal). A value given explicitly with @ needs no confirmation.
+
+Environment values can be a variable's value name (one) or literal text.`,
 	}}
 }
