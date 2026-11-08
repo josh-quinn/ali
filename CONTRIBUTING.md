@@ -12,7 +12,7 @@ Thanks for helping. A few ground rules, taken from the project [constitution](.s
   spec under `specs/`.
 
 ```sh
-brew install golangci-lint gitleaks
+brew install golangci-lint gitleaks shellcheck
 make hooks     # once per clone: every git push is scanned for secrets first
 make check     # fmt, vet, golangci-lint, tests, govulncheck, gitleaks: what CI runs
 ```

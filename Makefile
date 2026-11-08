@@ -13,6 +13,7 @@ man:
 	go run ./internal/tools/gendocs -out man -version $(VERSION)
 lint:
 	golangci-lint run ./...
+	shellcheck .githooks/pre-push
 vuln:
 	go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 # scan the whole history (every branch) for secrets, as CI does

@@ -96,7 +96,9 @@ jobs:
         with:
           go-version: stable # tools such as actionlint need a newer Go than the go.mod minimum
       - name: Man pages generate
-        run: make man && ls man | wc -l
+        run: make man && test -s man/ali.1 && find man -type f -name 'ali*' | wc -l
+      - name: Lint the git hooks (shellcheck)
+        run: shellcheck .githooks/pre-push
       - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           version: v2.20.0

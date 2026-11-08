@@ -16,7 +16,8 @@ root=$(git rev-parse --show-toplevel) || exit 1
 status=0
 
 # git passes one line per ref: <local ref> <local sha> <remote ref> <remote sha>
-while read -r local_ref local_sha remote_ref remote_sha; do
+# (the local ref name itself is not needed)
+while read -r _ local_sha remote_ref remote_sha; do
   case "$local_sha" in
     *[!0]*) ;;          # a real commit
     *) continue ;;      # all zeros: the ref is being deleted, nothing to publish

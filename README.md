@@ -348,7 +348,8 @@ make man            # man pages into man/
 make hooks          # once per clone: scan every push for secrets (needs gitleaks)
 ```
 
-Linting needs [golangci-lint](https://golangci-lint.run) v2 (`brew install golangci-lint`),
+Linting needs [golangci-lint](https://golangci-lint.run) v2 and
+[ShellCheck](https://www.shellcheck.net) (`brew install golangci-lint shellcheck`),
 and the secret scan needs [gitleaks](https://github.com/gitleaks/gitleaks)
 (`brew install gitleaks`). With `make hooks`, every `git push` first scans the commits
 it would publish and is blocked if anything looks like a token, key or password
