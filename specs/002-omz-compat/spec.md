@@ -16,6 +16,7 @@
 - Q: Should ali store the originals it overrides in its own store? → A: No. Originals are remembered in the live shell session only; the store may be synced to machines with different plugins.
 - Q: What does `ali doctor` return? → A: Exit 0 when every check that ran passed, 1 when any failed; checks it could not run are listed as "skipped", which alone does not fail.
 - Q: Does this feature change how plain aliases behave? → A: No. Only warnings, restoration on removal, the doctor command and block upgrades.
+- Q: Owner review comment: "make sure this tool is well documented with help and man page." → A: Added FR-008 and SC-006; because 002 is built first, it also brings help text, examples and man pages to every existing command.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -104,6 +105,7 @@ When ali's `.zshrc` block changes between versions, `ali init zsh` should replac
 - **FR-005**: `ali doctor` MUST check: block present; block after `oh-my-zsh.sh` if Oh My Zsh is used; block current; store valid; and (inside the wrapper) ali aliases not redefined after the block. It MUST exit non-zero if any check fails and MUST say which checks it could not run.
 - **FR-006**: `ali init zsh` MUST replace an outdated block in place, keep all other content unchanged, back up first, and refuse to edit a block whose markers are unbalanced.
 - **FR-007**: The README MUST document how ali works with Oh My Zsh.
+- **FR-008**: Every ali command, including the existing ones from feature 001 and the new `doctor`, MUST have a summary, description and at least one example in `--help`; `ali help files` MUST explain the files ali reads and writes; man pages MUST be generated from the same definitions and installed by the Homebrew formula (Constitution v1.2.0, ADR 0038).
 
 ### Key Entities
 
@@ -117,6 +119,7 @@ When ali's `.zshrc` block changes between versions, `ali init zsh` should replac
 - **SC-003**: `ali doctor` correctly flags each of the four misconfigurations in US3, with no false alarms on a healthy setup.
 - **SC-004**: Upgrading the block leaves every byte outside the block unchanged.
 - **SC-005**: No added shell startup cost beyond 1 ms.
+- **SC-006**: `man ali` and `man ali-<command>` work after a Homebrew install, and a test fails if any command lacks help text or an example.
 
 ## Assumptions
 

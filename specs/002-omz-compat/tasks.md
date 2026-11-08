@@ -9,7 +9,10 @@ description: "Task list for Oh My Zsh compatibility"
 **Tests**: required, written first (Constitution IV). Each task is one green, conventional commit with its tests.
 
 ## Phase 1: Setup
-- [ ] T001 Mark ADRs 0027-0029 Accepted (status line only) once the owner approves this plan
+- [x] T001 Mark ADRs 0027-0029 Accepted (status line only) once the owner approves this plan
+- [ ] T019 Tests then help completeness: a test walks the cobra tree and fails if any command lacks Short, Long or Example; fill in Long/Example for every existing command (add, ls, groups, search, update, regroup, rm, init, import) (FR-008)
+- [ ] T020 Tests then `ali help files` topic (store, generated file, lock, backups, settings) (FR-008)
+- [ ] T021 `internal/tools/gendocs` + `make man` generating `man/*.1` (ali.1, per command, topics); GoReleaser `before` hook and archive files; Homebrew formula installs pages; test that generation succeeds and every command has a page (ADR 0038, SC-006)
 
 ## Phase 2: Foundational (blocks US1, US2, US4)
 - [ ] T002 Tests then `internal/shellconf`: locate block markers, `Install` replaces an outdated block in place with backup; error on unbalanced/duplicate markers; bytes outside the block unchanged (research R4)
@@ -32,13 +35,13 @@ description: "Task list for Oh My Zsh compatibility"
 ## Phase 6: US3 Doctor (P2)
 - [ ] T012 [P] [US3] Tests then `internal/doctor`: checks and result model (data-model.md)
 - [ ] T013 [US3] Tests then `internal/render`: wrapper pipes shell state to `ali doctor --shell-state -`
-- [ ] T014 [US3] Tests then `internal/cli/doctor.go`: output and exit codes (contracts/cli.md)
+- [ ] T014 [US3] Tests then `internal/cli/doctor.go`: output and exit codes (contracts/cli.md), with Long and Example help
 - [ ] T015 [US3] E2E: each misconfiguration flagged; healthy setup passes; outside-wrapper run lists skipped checks
 
 ## Phase 7: Polish
-- [ ] T016 [P] README: "Using ali with Oh My Zsh" section; update Platform support/limitations text about shadow warnings
+- [ ] T016 [P] README: "Using ali with Oh My Zsh" section; update Platform support/limitations text about shadow warnings; document `ali help` and `man ali`
 - [ ] T017 [P] CHANGELOG entry
 - [ ] T018 Run quickstart.md; verify SC-001..SC-005 (startup delta < 1 ms)
 
 ## Dependencies
-Phase 2 → US1 → US2; US4 and US3 depend only on Phase 2 (US3's live check also needs T005's wrapper pattern). MVP = Phases 2-3.
+Phase 1 docs tasks (T019-T021) come first so every later command is written to the help standard. Phase 2 → US1 → US2; US4 and US3 depend only on Phase 2 (US3's live check also needs T005's wrapper pattern). MVP = Phases 2-3.
