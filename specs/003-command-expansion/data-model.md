@@ -42,7 +42,7 @@ ns = "prod"
 |--------|--------|-------|
 | Sub-alias | tool, name, expansion | name follows alias-name rules (ADR 0021 reserved words excluded) and must not start with `@` or `\`; tool is a group-style name (`^[a-z0-9][a-z0-9_-]*$`); expansion non-empty, placeholders outside quotes; unique per tool |
 | Shared sub-alias | name, expansion | as above; a tool sub-alias of the same name shadows it for that tool |
-| Variable | name, values (key → text), default | name `^[a-z][a-z0-9_]*$`, not `env`; keys same pattern; default must be a key; values non-empty, no NUL |
+| Variable | name, values (key → text), default | name `^[a-z][a-z0-9_]*$`, not `env`; keys `^[a-z0-9][a-z0-9_-]*$` (so `@kube-system` works); default must be a key; values non-empty, no NUL |
 | Environment | name, protected, set (variable → key or literal) | name `^[a-z][a-z0-9_-]*$`; every variable in `set` must exist; a value matching one of the variable's keys means that key |
 | Placeholder | `{{name}}` in an alias command or sub-alias expansion | recognised only if `name` is a variable; must not be inside quotes; deleting/renaming a referenced variable is refused |
 
