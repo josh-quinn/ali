@@ -32,10 +32,10 @@ description: "Task list for command expansion"
 - [x] T014 [P] [US2] Tests then `internal/cli/var.go` (add/set/unset/default/rm/ls/show, references)
 - [x] T015 [US2] Tests then save-time validation in `add`/`update`/`sub`: unknown-variable placeholders literal with notice; placeholders inside quotes rejected
 - [x] T016 [US2] Tests then `internal/render`: aliases containing placeholders rendered so they never run unexpanded (function fallback)
-- [ ] T017 [US2] E2E (zpty): `k g p n @sys`, default, `@ns=` literal, unresolved stays in editor with message, hostile value as one argument
+- [x] T017 [US2] E2E (zpty): `k g p n @sys`, default, `@ns=` literal, unresolved stays in editor with message, hostile value as one argument
 
 ## Phase 5: US3 Environments (P2)
-- [ ] T018 [US3] Tests then `internal/expand`: precedence chain (FR-009), `@@env`
+- [x] T018 [US3] Tests then `internal/expand`: precedence chain (FR-009), `@@env` (implemented and tested together with T013)
 - [ ] T019 [P] [US3] Tests then `internal/cli/env.go` (add/set/unset/protect/rm/ls/show/use/off/current)
 - [ ] T020 [US3] Tests then `internal/render`: wrapper handles `env use|off` (export/unset `ALI_ENV`), precmd prompt hook (research R8, R9); the hook must validate the environment name itself before putting it in RPROMPT (global-env and ALI_ENV are user-editable, and prompt_subst may be on), with a hostile-name test
 - [ ] T021 [US3] Tests then protected-environment confirm path in widget (`confirm` status → second Enter)
