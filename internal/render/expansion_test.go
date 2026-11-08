@@ -27,8 +27,8 @@ func TestNoExpansionCodeWithoutSubAliasesOrPlaceholders(t *testing.T) {
 	if strings.Contains(out, "_ali_trigger") || strings.Contains(out, "bindkey") || strings.Contains(out, "zle") {
 		t.Errorf("plain-alias users must pay nothing for expansion:\n%s", out)
 	}
-	if out != Zsh([]alias.Alias{{Name: "gp", Command: "git pull", Group: "git"}}) {
-		t.Error("Zsh and Render differ for plain aliases")
+	if !strings.HasPrefix(out, Zsh([]alias.Alias{{Name: "gp", Command: "git pull", Group: "git"}})) || strings.Contains(out, "functions[") {
+		t.Error("plain aliases must render as Zsh does, plus only the function cleanup")
 	}
 }
 
@@ -94,5 +94,38 @@ func TestExpansionCodeIsHijackSafe(t *testing.T) {
 				t.Errorf("unescaped %q in generated line %q", strings.TrimSpace(bare), line)
 			}
 		}
+	}
+}
+
+func TestPlaceholderAliasesBecomeFunctions(t *testing.T) {
+	in := expInput()
+	plain, funcs := Split(in)
+	for _, a := range plain {
+		if a.Name == "kgp" {
+			t.Error("kgp has a placeholder and must not be a plain alias")
+		}
+	}
+	if len(funcs) != 1 || funcs[0].Name != "kgp" {
+		t.Errorf("funcs = %v", funcs)
+	}
+	out := Render(in)
+	if strings.Contains(out, "\\alias -- kgp=") || !strings.Contains(out, "functions[kgp]=") {
+		t.Errorf("kgp not rendered as a function:\n%s", out)
+	}
+}
+
+func TestFunctionsAreRemovedWhenNoLongerNeeded(t *testing.T) {
+	zsh, err := exec.LookPath("zsh")
+	if err != nil {
+		t.Skip("zsh not installed")
+	}
+	dir := t.TempDir()
+	os.WriteFile(dir+"/1.zsh", []byte(Render(expInput())), 0o600)
+	without := expInput()
+	without.Aliases = without.Aliases[:2]
+	os.WriteFile(dir+"/2.zsh", []byte(Render(without)), 0o600)
+	out, _ := exec.Command(zsh, "-f", "-c", "source "+dir+"/1.zsh\nprint -r -- \"before=${+functions[kgp]}\"\nsource "+dir+"/2.zsh\nprint -r -- \"after=${+functions[kgp]}\"").CombinedOutput()
+	if !strings.Contains(string(out), "before=1") || !strings.Contains(string(out), "after=0") {
+		t.Errorf("%s", out)
 	}
 }

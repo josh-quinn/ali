@@ -21,7 +21,8 @@ type Input struct {
 // or placeholders exist, the tables and line-editor widgets for visible
 // expansion (ADRs 0030, 0035). Users with plain aliases get exactly Zsh's output.
 func Render(in Input) string {
-	out := Zsh(in.Aliases)
+	plain, funcs := Split(in)
+	out := Zsh(plain) + functionsCode(funcs)
 	trigger, subw := gateTables(in)
 	if len(trigger) == 0 {
 		return out
@@ -32,6 +33,53 @@ func Render(in Input) string {
 	b.WriteString("_ali_trigger=(" + assocOnes(trigger) + ")\n")
 	b.WriteString("_ali_subw=(" + assocOnes(subw) + ")\n")
 	b.WriteString(widgets)
+	return b.String()
+}
+
+// Split separates aliases rendered as plain zsh aliases from those rendered as
+// functions. An alias containing a placeholder becomes a function that asks ali
+// to expand it, so it can never run with a literal {{name}} (for example when
+// the line editor is not involved).
+func Split(in Input) (plain, funcs []alias.Alias) {
+	vars := map[string]bool{}
+	for _, v := range in.Vars {
+		vars[v] = true
+	}
+	for _, a := range in.Aliases {
+		isFunc := false
+		for _, p := range model.PlaceholderNames(a.Command) {
+			if vars[p] {
+				isFunc = true
+			}
+		}
+		if isFunc {
+			funcs = append(funcs, a)
+		} else {
+			plain = append(plain, a)
+		}
+	}
+	return plain, funcs
+}
+
+// functionsCode defines the function-rendered aliases and removes functions
+// ali defined earlier in this session that are no longer needed.
+func functionsCode(funcs []alias.Alias) string {
+	names := make([]string, len(funcs))
+	for i, a := range funcs {
+		names[i] = Quote(a.Name)
+	}
+	var b strings.Builder
+	b.WriteString("\\typeset -ga _ali_funcs\n")
+	b.WriteString("_ali_fold=($_ali_funcs)\n")
+	b.WriteString("_ali_funcs=(" + strings.Join(names, " ") + ")\n")
+	b.WriteString("for _n in ${_ali_fold:|_ali_funcs}; do \\unfunction -- \"$_n\" 2>/dev/null; done\n")
+	b.WriteString("\\unset _n _ali_fold\n")
+	for _, a := range funcs {
+		body := `\local _c; _c="$(\command ali expand --run -- ` + Quote(a.Name) + ` "$@")" || \return $?; \eval "$_c"`
+		// The key is not quoted: quotes in a subscript would become part of the
+		// function's name. Alias names are validated to safe characters.
+		b.WriteString("functions[" + a.Name + "]=" + Quote(body) + "\n")
+	}
 	return b.String()
 }
 

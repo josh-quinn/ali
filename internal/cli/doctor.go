@@ -42,11 +42,12 @@ from a script it is reported as skipped. Exits with status 1 if any check fails.
 				gen, snap := doctor.ParseState(string(raw))
 				in.Overridden = map[string]string{}
 				if storeErr == nil {
-					if gen != render.Gen(d.All()) {
+					plain, _ := render.Split(d.RenderInput())
+					if gen != render.Gen(plain) {
 						in.SnapshotStale = true
 					} else {
 						want := map[string]string{}
-						for _, x := range d.All() {
+						for _, x := range plain {
 							want[x.Name] = x.Command
 						}
 						in.Overridden = doctor.Compare(want, snap)

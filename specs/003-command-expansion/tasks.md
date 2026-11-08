@@ -31,7 +31,7 @@ description: "Task list for command expansion"
 - [x] T013 [US2] Tests then `internal/expand`: placeholder parsing (defined variables only), `@key`, `@var=value`, ambiguity error, unmatched `@` words left alone, same value for repeated placeholders
 - [x] T014 [P] [US2] Tests then `internal/cli/var.go` (add/set/unset/default/rm/ls/show, references)
 - [x] T015 [US2] Tests then save-time validation in `add`/`update`/`sub`: unknown-variable placeholders literal with notice; placeholders inside quotes rejected
-- [ ] T016 [US2] Tests then `internal/render`: aliases containing placeholders rendered so they never run unexpanded (function fallback)
+- [x] T016 [US2] Tests then `internal/render`: aliases containing placeholders rendered so they never run unexpanded (function fallback)
 - [ ] T017 [US2] E2E (zpty): `k g p n @sys`, default, `@ns=` literal, unresolved stays in editor with message, hostile value as one argument
 
 ## Phase 5: US3 Environments (P2)

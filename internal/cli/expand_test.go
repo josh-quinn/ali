@@ -57,3 +57,23 @@ func TestExpandZleNeverFailsTheWidgetOnStoreErrors(t *testing.T) {
 		t.Errorf("want error status naming the file, got %q", f)
 	}
 }
+
+func TestExpandRunQuotesWordsAndAlwaysExpandsTheAlias(t *testing.T) {
+	e := newEnv(t)
+	seedSubs(e)
+	e.must("var", "add", "ns", "sys=kube-system", "--default", "sys")
+	e.must("add", "kgp", "kubectl get pods -n {{ns}}")
+	cases := map[string][]string{
+		"kubectl get pods -n kube-system":         {"kgp"},
+		"kubectl get pods -n 'a b'":               {"kgp", "@ns=a b"},
+		"kubectl logs 'my pod'":                   {"k", "logs", "my pod"}, // nothing to expand: k still expands, no recursion
+		`kubectl get \p`:                          {"k", "g", `\p`},
+		"kubectl get pods -n kube-system '$(id)'": {"kgp", "$(id)"},
+	}
+	for want, words := range cases {
+		out := e.must(append([]string{"expand", "--run", "--"}, words...)...)
+		if strings.TrimSpace(out) != want {
+			t.Errorf("%q => %q, want %q", words, strings.TrimSpace(out), want)
+		}
+	}
+}

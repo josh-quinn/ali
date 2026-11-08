@@ -32,6 +32,7 @@ const (
 // Options control one expansion.
 type Options struct {
 	Mode        Mode
+	ForceAlias  bool   // always expand an ali alias in command position (run-time functions)
 	TerminalEnv string // ALI_ENV
 	GlobalEnv   string // contents of global-env
 }
@@ -141,7 +142,7 @@ func Expand(line string, d *Defs, opt Options) (Result, error) {
 		// A plain alias only expands on the line when something else in the
 		// command is expanded, or it contains placeholders; otherwise zsh
 		// expands it as usual (FR-017).
-		if info.alias != "" && (len(subEdits) > 0 || d.hasPlaceholder(d.Aliases[info.alias])) {
+		if info.alias != "" && (len(subEdits) > 0 || opt.ForceAlias || d.hasPlaceholder(d.Aliases[info.alias])) {
 			w := c.Words[info.cmdWord]
 			edits = append(edits, edit{w.Start, w.End, d.Aliases[info.alias]})
 		}
