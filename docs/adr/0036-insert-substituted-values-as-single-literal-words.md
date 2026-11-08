@@ -1,6 +1,6 @@
 # 0036. Insert substituted values as single literal words
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-11-08
 - **Spec**: Constitution VII; Security rule
 

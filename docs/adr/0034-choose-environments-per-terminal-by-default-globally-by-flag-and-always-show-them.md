@@ -1,6 +1,6 @@
 # 0034. Choose environments per terminal by default, globally by flag, and always show them
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-11-08
 - **Spec**: owner decision 3
 

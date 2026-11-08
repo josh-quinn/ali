@@ -1,6 +1,6 @@
 # 0037. Store format v2 only when used, with machine-local settings kept separate
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-11-08
 - **Spec**: specs/003-command-expansion research R12, data-model
 

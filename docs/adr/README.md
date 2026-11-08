@@ -35,12 +35,12 @@ as the change it records.
 | [0027](0027-learn-about-the-live-shell-through-the-wrapper.md) | Learn about the live shell through the wrapper | Accepted |
 | [0028](0028-remember-overridden-aliases-in-the-shell-session.md) | Remember overridden aliases in the shell session | Accepted |
 | [0029](0029-upgrade-the-managed-block-in-place.md) | Upgrade the managed block in place | Accepted |
-| [0030](0030-show-expansions-in-the-command-line-by-default.md) | Show expansions in the command line by default | Proposed |
-| [0031](0031-scope-sub-aliases-to-the-tool-and-expand-only-a-leading-run-of-words.md) | Scope sub-aliases to the tool and expand only a leading run of words | Proposed |
-| [0032](0032-use-named-name-placeholders-recognised-only-for-defined-variables.md) | Use named {{name}} placeholders recognised only for defined variables | Proposed |
-| [0033](0033-use-for-call-time-values-and-for-a-one-off-environment.md) | Use @ for call-time values and @@ for a one-off environment | Proposed |
-| [0034](0034-choose-environments-per-terminal-by-default-globally-by-flag-and-always-show-them.md) | Choose environments per terminal by default, globally by flag, and always show them | Proposed |
-| [0035](0035-one-expansion-engine-in-go-behind-thin-gated-zsh-widgets.md) | One expansion engine in Go behind thin, gated zsh widgets | Proposed |
-| [0036](0036-insert-substituted-values-as-single-literal-words.md) | Insert substituted values as single literal words | Proposed |
-| [0037](0037-store-format-v2-only-when-used-with-machine-local-settings-kept-separate.md) | Store format v2 only when used, with machine-local settings kept separate | Proposed |
+| [0030](0030-show-expansions-in-the-command-line-by-default.md) | Show expansions in the command line by default | Accepted |
+| [0031](0031-scope-sub-aliases-to-the-tool-and-expand-them-anywhere-in-the-command.md) | Scope sub-aliases to the tool and expand them anywhere in the command | Accepted |
+| [0032](0032-use-named-name-placeholders-recognised-only-for-defined-variables.md) | Use named {{name}} placeholders recognised only for defined variables | Accepted |
+| [0033](0033-use-for-call-time-values-and-for-a-one-off-environment.md) | Use @ for call-time values and @@ for a one-off environment | Accepted |
+| [0034](0034-choose-environments-per-terminal-by-default-globally-by-flag-and-always-show-them.md) | Choose environments per terminal by default, globally by flag, and always show them | Accepted |
+| [0035](0035-one-expansion-engine-in-go-behind-thin-gated-zsh-widgets.md) | One expansion engine in Go behind thin, gated zsh widgets | Accepted |
+| [0036](0036-insert-substituted-values-as-single-literal-words.md) | Insert substituted values as single literal words | Accepted |
+| [0037](0037-store-format-v2-only-when-used-with-machine-local-settings-kept-separate.md) | Store format v2 only when used, with machine-local settings kept separate | Accepted |
 | [0038](0038-generate-help-and-man-pages-from-the-command-tree.md) | Generate help and man pages from the command tree | Accepted |

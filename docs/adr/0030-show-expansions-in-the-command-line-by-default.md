@@ -1,6 +1,6 @@
 # 0030. Show expansions in the command line by default
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-11-08
 - **Spec**: specs/003-command-expansion; owner decision 1
 

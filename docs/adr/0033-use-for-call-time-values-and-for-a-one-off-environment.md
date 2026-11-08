@@ -1,6 +1,6 @@
 # 0033. Use @ for call-time values and @@ for a one-off environment
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-11-08
 - **Spec**: owner decision 4
 

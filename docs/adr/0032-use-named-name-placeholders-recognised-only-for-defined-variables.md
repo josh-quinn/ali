@@ -1,6 +1,6 @@
 # 0032. Use named {{name}} placeholders recognised only for defined variables
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-11-08
 - **Spec**: owner decision 2; spec clarifications
 

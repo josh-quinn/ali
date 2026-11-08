@@ -1,6 +1,6 @@
 # 0035. One expansion engine in Go behind thin, gated zsh widgets
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-11-08
 - **Spec**: specs/003-command-expansion research R1-R4
 
