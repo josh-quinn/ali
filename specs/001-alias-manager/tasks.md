@@ -68,7 +68,7 @@ description: "Task list for the Alias Manager (ali)"
 
 - [x] T025 [P] `README.md`: problem statement, install (brew + go install), quick start, command reference, FAQ (why a wrapper function)
 - [x] T026 [P] `CONTRIBUTING.md`, issue templates, `CHANGELOG.md`
-- [ ] T027 [P] `.goreleaser.yaml` written; still to do: `goreleaser check` (goreleaser not installed here)
+- [x] T027 [P] `.goreleaser.yaml` (darwin arm64/amd64, checksums, Homebrew tap); `goreleaser check` passes with GoReleaser v2.20.0 (feature 003 release prep, ADR 0039)
 - [x] T028 Run quickstart.md end-to-end in a sandbox; verify SC-001..SC-007 (incl. SC-004: time `zsh -i -c exit` with and without the block, delta < 5 ms); `go vet`, `gofmt -l .`, `go test ./...`
 - [ ] T029 Commit; ask the user before creating the public GitHub repo or pushing
 

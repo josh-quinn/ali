@@ -12,7 +12,7 @@ as the change it records.
 | [0004](0004-implement-in-go-as-a-single-static-binary.md) | Implement in Go as a single static binary | Accepted |
 | [0005](0005-name-the-command-ali.md) | Name the command ali | Accepted |
 | [0006](0006-depend-only-on-cobra-and-go-toml.md) | Depend only on cobra and go-toml | Accepted |
-| [0007](0007-release-under-mit-via-goreleaser-and-a-homebrew-tap.md) | Release under MIT via GoReleaser and a Homebrew tap | Accepted |
+| [0007](0007-release-under-mit-via-goreleaser-and-a-homebrew-tap.md) | Release under MIT via GoReleaser and a Homebrew tap | Superseded by [0039](0039-distribute-with-a-homebrew-cask-built-by-goreleaser.md) |
 | [0008](0008-group-aliases-by-the-first-real-word-of-the-command.md) | Group aliases by the first real word of the command | Accepted |
 | [0009](0009-store-aliases-as-hand-editable-toml.md) | Store aliases as hand-editable TOML | Accepted |
 | [0010](0010-generate-aliases-zsh-and-source-it-from-zshrc.md) | Generate aliases.zsh and source it from .zshrc | Accepted |
@@ -44,3 +44,4 @@ as the change it records.
 | [0036](0036-insert-substituted-values-as-single-literal-words.md) | Insert substituted values as single literal words | Accepted |
 | [0037](0037-store-format-v2-only-when-used-with-machine-local-settings-kept-separate.md) | Store format v2 only when used, with machine-local settings kept separate | Accepted |
 | [0038](0038-generate-help-and-man-pages-from-the-command-tree.md) | Generate help and man pages from the command tree | Accepted |
+| [0039](0039-distribute-with-a-homebrew-cask-built-by-goreleaser.md) | Distribute with a Homebrew cask built by GoReleaser | Accepted |

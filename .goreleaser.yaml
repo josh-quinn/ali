@@ -18,18 +18,31 @@ archives:
       - LICENSE
       - README.md
       - man/*
+release:
+  github:
+    owner: josh-quinn
+    name: ali
 checksum:
   name_template: checksums.txt
 changelog:
   sort: asc
-brews:
-  - repository:
+homebrew_casks:
+  - name: ali
+    repository:
       owner: josh-quinn
       name: homebrew-tap
     homepage: https://github.com/josh-quinn/ali
     description: Create, find and organise shell aliases without touching .zshrc
     license: MIT
-    install: |
-      bin.install "ali"
-      man1.install Dir["man/*.1"]
-      man7.install Dir["man/*.7"]
+    binaries: [ali]
+    manpages:
+      - man/*.1
+      - man/*.7
+    hooks:
+      post:
+        # The binary is not notarized; clear the download quarantine so macOS
+        # lets it run (see goreleaser.com/customization/homebrew_casks).
+        install_steps: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/ali"]
+          end

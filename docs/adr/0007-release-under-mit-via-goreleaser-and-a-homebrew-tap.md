@@ -1,6 +1,6 @@
 # 0007. Release under MIT via GoReleaser and a Homebrew tap
 
-- **Status**: Accepted
+- **Status**: Superseded by [0039](0039-distribute-with-a-homebrew-cask-built-by-goreleaser.md)
 - **Date**: 2026-11-08
 - **Spec**: Constitution, Public Open-Source Standards
 
