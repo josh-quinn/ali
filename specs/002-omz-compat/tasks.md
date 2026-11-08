@@ -35,7 +35,7 @@ description: "Task list for Oh My Zsh compatibility"
 ## Phase 6: US3 Doctor (P2)
 - [x] T012 [P] [US3] Tests then `internal/doctor`: checks and result model (data-model.md)
 - [x] T013 [US3] Tests then `internal/render`: wrapper pipes shell state to `ali doctor --shell-state -`
-- [ ] T014 [US3] Tests then `internal/cli/doctor.go`: output and exit codes (contracts/cli.md), with Long and Example help
+- [x] T014 [US3] Tests then `internal/cli/doctor.go`: output and exit codes (contracts/cli.md), with Long and Example help
 - [ ] T015 [US3] E2E: each misconfiguration flagged; healthy setup passes; outside-wrapper run lists skipped checks
 
 ## Phase 7: Polish

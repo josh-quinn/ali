@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/josh-quinn/ali/internal/store"
@@ -24,10 +25,15 @@ func newEnv(t *testing.T) *env {
 }
 
 // run executes ali with args and returns stdout, stderr and the error.
-
 func (e *env) run(args ...string) (string, string, error) {
+	return e.runIn("", args...)
+}
+
+// runIn is run with stdin.
+func (e *env) runIn(stdin string, args ...string) (string, string, error) {
 	var out, errb bytes.Buffer
 	root := NewRoot("test", e.st, &out, &errb)
+	root.SetIn(strings.NewReader(stdin))
 	root.SetArgs(args)
 	err := root.Execute()
 	return out.String(), errb.String(), err
