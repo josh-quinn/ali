@@ -16,7 +16,7 @@ description: "Task list for Oh My Zsh compatibility"
 
 ## Phase 2: Foundational (blocks US1, US2, US4)
 - [x] T002 Tests then `internal/shellconf`: locate block markers, `Install` replaces an outdated block in place with backup; error on unbalanced/duplicate markers; bytes outside the block unchanged (research R4)
-- [ ] T003 Tests then `internal/render`: block v2 text with version line; wrapper still hijack-safe (ADR 0021)
+- [x] T003 Tests then `internal/render`: block v2 text with version line; wrapper still hijack-safe (ADR 0021)
 
 ## Phase 3: US1 Warn on overriding shell aliases/functions (P1) 🎯 MVP
 - [ ] T004 [P] [US1] Tests then `internal/shelldef`: parse `ALI_SHELL_DEF` (alias/function/empty, malformed → ignored)

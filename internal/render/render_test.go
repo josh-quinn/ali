@@ -94,6 +94,9 @@ func TestZshUnaliasesPrevious(t *testing.T) {
 
 func TestBlock(t *testing.T) {
 	b := Block()
+	if !strings.Contains(b, "# ali block v2, managed by ali init zsh") {
+		t.Errorf("block has no version line:\n%s", b)
+	}
 	if !strings.HasPrefix(b, BlockStart) || !strings.HasSuffix(strings.TrimSpace(b), BlockEnd) {
 		t.Errorf("block markers missing:\n%s", b)
 	}

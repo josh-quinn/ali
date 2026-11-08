@@ -3,6 +3,7 @@ package render
 
 import (
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/josh-quinn/ali/internal/alias"
@@ -12,6 +13,10 @@ import (
 const (
 	BlockStart = "# >>> ali >>>"
 	BlockEnd   = "# <<< ali <<<"
+	// BlockVersion is bumped whenever the block text changes, so people reading
+	// their .zshrc can tell which revision they have. Upgrades compare the whole
+	// text, not this number (ADR 0029).
+	BlockVersion = 2
 )
 
 // Quote wraps s in single quotes so zsh treats it literally.
@@ -48,7 +53,7 @@ func Zsh(aliases []alias.Alias) string {
 // backslash-escaped because functions are parsed when defined, so a user alias
 // of "command" or "source" would otherwise hijack the wrapper.
 func Block() string {
-	return BlockStart + `
+	return BlockStart + "\n# ali block v" + strconv.Itoa(BlockVersion) + ", managed by ali init zsh" + `
 _ali_dir="${ALI_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/ali}"
 [ -f "$_ali_dir/aliases.zsh" ] && \source "$_ali_dir/aliases.zsh"
 ali() { \command ali "$@"; \local rc=$?; [ -f "$_ali_dir/aliases.zsh" ] && \source "$_ali_dir/aliases.zsh"; \unset _n; \return $rc; }
