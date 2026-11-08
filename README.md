@@ -312,15 +312,21 @@ Other current limits:
 make build          # ./ali
 make check          # everything CI checks: fmt, vet, golangci-lint, tests, govulncheck
 make man            # man pages into man/
+make hooks          # once per clone: scan every push for secrets (needs gitleaks)
 ```
 
-Linting needs [golangci-lint](https://golangci-lint.run) v2 (`brew install golangci-lint`).
+Linting needs [golangci-lint](https://golangci-lint.run) v2 (`brew install golangci-lint`),
+and the secret scan needs [gitleaks](https://github.com/gitleaks/gitleaks)
+(`brew install gitleaks`). With `make hooks`, every `git push` first scans the commits
+it would publish and is blocked if anything looks like a token, key or password
+([ADR 0041](docs/adr/0041-scan-for-secrets-before-every-push-and-again-in-ci.md));
+CI scans the full history again.
 The end-to-end tests drive a real zsh through `zsh/zpty` in a throwaway home directory,
 so they never touch your own shell configuration.
 
 Every pull request runs, on macOS and Linux with Go 1.24 and the latest Go: the full
 test suite with the race detector, gofmt, go vet, golangci-lint (with gosec),
-govulncheck, CodeQL, OpenSSF Scorecard, dependency review, actionlint and
+govulncheck, gitleaks (full history), CodeQL, OpenSSF Scorecard, dependency review, actionlint and
 `goreleaser check`. All of these are free for open-source projects
 ([ADR 0040](docs/adr/0040-gate-every-change-with-free-open-source-quality-and-security-checks.md)).
 

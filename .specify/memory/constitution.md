@@ -92,6 +92,8 @@ implement. The plan's Constitution Check MUST be re-run before implementation st
 - Anything that writes outside `~/.config/ali/`, parses untrusted text, or emits shell code
   MUST be reviewed for injection, path and permission issues, with a regression test for
   every issue found.
+- No secret may be pushed: every clone enables the pre-push secret scan (`make hooks`), and
+  CI scans the full history; bypassing the hook requires a deliberate `--no-verify`.
 
 ## Governance
 
@@ -101,4 +103,4 @@ MINOR for adding a principle or materially expanding guidance, PATCH for wording
 Every plan and review MUST verify compliance; added complexity MUST be justified in the
 plan's complexity tracking table.
 
-**Version**: 2.1.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
+**Version**: 2.2.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
