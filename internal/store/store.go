@@ -185,8 +185,12 @@ func (d *Data) marshal() ([]byte, error) {
 // succeeds, atomically saves the store and regenerates aliases.zsh. If the
 // store file is invalid or fn fails, nothing on disk changes.
 func (s *Store) Update(fn func(*Data) error) error {
-	if err := os.MkdirAll(s.Dir, 0o755); err != nil {
-		return err
+	// Aliases may embed tokens, so a directory we create is private. A directory
+	// that already exists is left alone: it might be shared (ALI_CONFIG_DIR).
+	if _, err := os.Stat(s.Dir); os.IsNotExist(err) {
+		if err := os.MkdirAll(s.Dir, 0o700); err != nil {
+			return err
+		}
 	}
 	lock, err := os.OpenFile(filepath.Join(s.Dir, lockName), os.O_CREATE|os.O_RDWR, 0o600)
 	if err != nil {
@@ -209,10 +213,10 @@ func (s *Store) Update(fn func(*Data) error) error {
 	if err != nil {
 		return err
 	}
-	if err := WriteAtomic(s.File(), body, 0o644); err != nil {
+	if err := WriteAtomic(s.File(), body, 0o600); err != nil {
 		return err
 	}
-	return WriteAtomic(s.ZshFile(), []byte(render.Zsh(d.All())), 0o644)
+	return WriteAtomic(s.ZshFile(), []byte(render.Zsh(d.All())), 0o600)
 }
 
 // WriteAtomic writes data to path via a temp file in the same directory,
