@@ -24,3 +24,5 @@ as the change it records.
 | [0016](0016-warn-but-do-not-block-when-an-alias-shadows-a-command.md) | Warn but do not block when an alias shadows a command | Accepted |
 | [0017](0017-make-import-conservative-and-non-destructive.md) | Make import conservative and non-destructive | Accepted |
 | [0018](0018-back-up-user-files-before-changing-them.md) | Back up user files before changing them | Accepted |
+| [0019](0019-limit-v1-scope-to-aliases-on-zsh-macos-first.md) | Limit v1 scope to aliases on zsh (macOS first) | Accepted |
+| [0020](0020-test-end-to-end-through-a-line-fed-interactive-zsh.md) | Test end to end through a line-fed interactive zsh | Accepted |
