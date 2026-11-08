@@ -51,6 +51,14 @@ func Zsh(aliases []alias.Alias) string {
 	b.WriteString("  if (( ${+aliases[$_n]} && ! ${+_ali_prev[$_n]} )); then _ali_prev[$_n]=${aliases[$_n]}; fi\n")
 	b.WriteString("done\n")
 	b.WriteString("\\unset _n\n")
+	// What each ali alias should be; the block's first-prompt check compares
+	// against it to find later redefinitions for "ali doctor".
+	pairs := make([]string, 0, 2*len(sorted))
+	for _, a := range sorted {
+		pairs = append(pairs, Quote(a.Name), Quote(a.Command))
+	}
+	b.WriteString("\\typeset -gA _ali_expected\n")
+	b.WriteString("_ali_expected=(" + strings.Join(pairs, " ") + ")\n")
 	for _, a := range sorted {
 		b.WriteString("\\alias -- " + a.Name + "=" + Quote(a.Command) + "\n")
 	}
@@ -65,9 +73,25 @@ func Block() string {
 	return BlockStart + "\n# ali block v" + strconv.Itoa(BlockVersion) + ", managed by ali init zsh" + `
 _ali_dir="${ALI_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/ali}"
 [ -f "$_ali_dir/aliases.zsh" ] && \source "$_ali_dir/aliases.zsh"
+# At the first prompt, after every rc file has run, note any ali alias that
+# something loaded later has changed, for "ali doctor". Runs once, no process.
+\typeset -gA _ali_overridden
+_ali_startup_check() {
+  \local _k
+  _ali_overridden=()
+  for _k in ${(k)_ali_expected}; do
+    [[ ${aliases[$_k]-} == "${_ali_expected[$_k]}" ]] || _ali_overridden[$_k]=${aliases[$_k]-}
+  done
+  \add-zsh-hook -d precmd _ali_startup_check
+}
+\autoload -Uz add-zsh-hook
+\add-zsh-hook precmd _ali_startup_check
 ali() {
   # For "ali add NAME", tell the binary what NAME means in this shell (ADR 0027).
-  if [[ $1 == add && -n $2 ]]; then
+  if [[ $1 == doctor ]]; then
+    # Pass what the first-prompt check found (NUL-separated name/value pairs).
+    \print -rN -- "${(@kv)_ali_overridden}" | \command ali doctor --shell-state - "${@:2}"
+  elif [[ $1 == add && -n $2 ]]; then
     \local _d=
     if (( ${+aliases[$2]} && ! ${_ali_names[(Ie)$2]} )); then _d="alias"$'\t'"${aliases[$2]}"
     elif (( ${+functions[$2]} )); then _d=function

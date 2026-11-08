@@ -132,7 +132,7 @@ func runBlock(t *testing.T, script string) string {
 	dir := t.TempDir()
 	bin := dir + "/bin"
 	os.Mkdir(bin, 0o755)
-	os.WriteFile(bin+"/ali", []byte("#!/bin/sh\n[ \"$1\" = fail ] && exit 3\nprintf 'def=[%s] args=[%s]\\n' \"${ALI_SHELL_DEF-unset}\" \"$*\"\n"), 0o755)
+	os.WriteFile(bin+"/ali", []byte("#!/bin/sh\n[ \"$1\" = fail ] && exit 3\n[ \"$1\" = doctor ] && { printf 'args=[%s] stdin=[' \"$*\"; tr '\\000' '|'; printf ']\\n'; exit 0; }\nprintf 'def=[%s] args=[%s]\\n' \"${ALI_SHELL_DEF-unset}\" \"$*\"\n"), 0o755)
 	cfg := dir + "/cfg"
 	os.Mkdir(cfg, 0o700)
 	os.WriteFile(cfg+"/aliases.zsh", []byte(Zsh([]alias.Alias{{Name: "mine", Command: "echo mine", Group: "echo"}})), 0o600)
@@ -221,5 +221,33 @@ func TestRestoringPreservesTrickyOriginals(t *testing.T) {
 	out := sourceSeq(t, `alias gp='echo "it'\''s" $HOME'`, [][]alias.Alias{gp, nil}, "alias gp")
 	if want := `gp='echo "it'\''s" $HOME'`; strings.TrimSpace(out) != want {
 		t.Errorf("got %q, want %q", strings.TrimSpace(out), want)
+	}
+}
+
+func TestZshRecordsExpectedDefinitions(t *testing.T) {
+	out := Zsh([]alias.Alias{{Name: "gp", Command: "it's", Group: "x"}})
+	if !strings.Contains(out, `_ali_expected=('gp' 'it'\''s')`) {
+		t.Errorf("expected map missing:\n%s", out)
+	}
+}
+
+func TestStartupCheckFindsLaterRedefinitionsAndDoctorReceivesThem(t *testing.T) {
+	// "mine" is defined by ali (see runBlock); a later rc line redefines it.
+	out := runBlock(t, `alias mine='echo hijacked-later'
+_ali_startup_check
+add-zsh-hook -L precmd | grep -c _ali_startup_check
+ali doctor --verbose`)
+	if !strings.Contains(out, "args=[doctor --shell-state - --verbose] stdin=[mine|echo hijacked-later|]") {
+		t.Errorf("doctor did not receive the redefinition:\n%s", out)
+	}
+	if !strings.Contains(out, "0\n") {
+		t.Errorf("startup check did not remove itself from precmd:\n%s", out)
+	}
+}
+
+func TestStartupCheckWithNothingRedefined(t *testing.T) {
+	out := runBlock(t, "_ali_startup_check\nali doctor")
+	if !strings.Contains(out, "args=[doctor --shell-state -] stdin=[") || strings.Contains(out, "mine|") {
+		t.Errorf("unexpected doctor input:\n%s", out)
 	}
 }
