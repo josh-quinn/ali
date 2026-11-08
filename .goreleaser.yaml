@@ -1,0 +1,26 @@
+version: 2
+project_name: ali
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - main: ./cmd/ali
+    binary: ali
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux]
+    goarch: [arm64, amd64]
+    ldflags: ["-s -w -X main.version={{.Version}}"]
+archives:
+  - formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+checksum:
+  name_template: checksums.txt
+changelog:
+  sort: asc
+brews:
+  - repository:
+      owner: josh-quinn
+      name: homebrew-tap
+    homepage: https://github.com/josh-quinn/ali
+    description: Create, find and organise shell aliases without touching .zshrc
+    license: MIT
