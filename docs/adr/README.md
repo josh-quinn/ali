@@ -46,3 +46,4 @@ as the change it records.
 | [0038](0038-generate-help-and-man-pages-from-the-command-tree.md) | Generate help and man pages from the command tree | Accepted |
 | [0039](0039-distribute-with-a-homebrew-cask-built-by-goreleaser.md) | Distribute with a Homebrew cask built by GoReleaser | Accepted |
 | [0040](0040-gate-every-change-with-free-open-source-quality-and-security-checks.md) | Gate every change with free, open-source quality and security checks | Accepted |
+| [0041](0041-scan-for-secrets-before-every-push-and-again-in-ci.md) | Scan for secrets before every push and again in CI | Accepted |
