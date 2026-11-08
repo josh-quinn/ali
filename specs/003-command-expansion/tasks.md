@@ -28,7 +28,7 @@ description: "Task list for command expansion"
 - [x] T012 [US1] E2E (zpty): `k g p ` shows `kubectl get pods `; `k get p ` expands `p`; `k logs \p` stays literal; Enter without space expands; history text; `kubectl g p`; plain `ls` spawns no process
 
 ## Phase 4: US2 Placeholders and @ values (P1)
-- [ ] T013 [US2] Tests then `internal/expand`: placeholder parsing (defined variables only), `@key`, `@var=value`, ambiguity error, unmatched `@` words left alone, same value for repeated placeholders
+- [x] T013 [US2] Tests then `internal/expand`: placeholder parsing (defined variables only), `@key`, `@var=value`, ambiguity error, unmatched `@` words left alone, same value for repeated placeholders
 - [ ] T014 [P] [US2] Tests then `internal/cli/var.go` (add/set/unset/default/rm/ls/show, references)
 - [ ] T015 [US2] Tests then save-time validation in `add`/`update`/`sub`: unknown-variable placeholders literal with notice; placeholders inside quotes rejected
 - [ ] T016 [US2] Tests then `internal/render`: aliases containing placeholders rendered so they never run unexpanded (function fallback)

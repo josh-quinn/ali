@@ -139,14 +139,33 @@ func Expand(line string, d *Defs, opt Options) (Result, error) {
 			}
 		}
 		// A plain alias only expands on the line when something else in the
-		// command is expanded; otherwise zsh expands it as usual (FR-017).
-		if info.alias != "" && len(subEdits) > 0 {
+		// command is expanded, or it contains placeholders; otherwise zsh
+		// expands it as usual (FR-017).
+		if info.alias != "" && (len(subEdits) > 0 || d.hasPlaceholder(d.Aliases[info.alias])) {
 			w := c.Words[info.cmdWord]
 			edits = append(edits, edit{w.Start, w.End, d.Aliases[info.alias]})
 		}
 		edits = append(edits, subEdits...)
 	}
-	return Result{Line: apply(line, edits), Changed: len(edits) > 0}, nil
+	res := Result{Line: apply(line, edits)}
+	if opt.Mode == Full {
+		out, err := resolvePlaceholders(res.Line, d, opt, &res)
+		if err != nil {
+			return Result{Line: line, Warnings: res.Warnings}, err
+		}
+		res.Line = out
+	}
+	res.Changed = res.Line != line
+	return res, nil
+}
+
+func (d *Defs) hasPlaceholder(text string) bool {
+	for _, n := range model.PlaceholderNames(text) {
+		if _, ok := d.Vars[n]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 func apply(line string, edits []edit) string {
