@@ -11,7 +11,7 @@ description: "Task list for command expansion"
 
 ## Phase 1: Setup
 - [x] T001 Mark ADRs 0030-0037 Accepted once the owner approves this plan
-- [ ] T002 [P] `tests/e2e/zle/`: zpty driver helper (send keys, read line, tolerate bracketed-paste escapes) with a self-test (research R10)
+- [x] T002 [P] `tests/e2e/zle_helper_test.go`: zpty driver helper (send keys, read line, tolerate bracketed-paste escapes) with a self-test (research R10)
 
 ## Phase 2: Foundational (blocks all stories)
 - [ ] T003 [P] Tests then `internal/model`: Sub, Variable, Environment types and validation rules (data-model.md)
