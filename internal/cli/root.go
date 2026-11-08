@@ -56,7 +56,7 @@ Run "ali help files" to see which files ali reads and writes.`,
 	root.SetFlagErrorFunc(func(_ *cobra.Command, err error) error { return &UsageError{err} })
 	root.CompletionOptions.DisableDefaultCmd = true
 	root.AddCommand(a.addCmd(), a.lsCmd(), a.groupsCmd(), a.searchCmd(),
-		a.updateCmd(), a.regroupCmd(), a.rmCmd(), a.initCmd(), a.importCmd(), a.doctorCmd(), a.subCmd(), a.varCmd(), a.expandCmd())
+		a.updateCmd(), a.regroupCmd(), a.rmCmd(), a.initCmd(), a.importCmd(), a.doctorCmd(), a.subCmd(), a.varCmd(), a.envCmd(), a.expandCmd())
 	root.AddCommand(topicCmds()...)
 	return root
 }
