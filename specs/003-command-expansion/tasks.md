@@ -15,7 +15,7 @@ description: "Task list for command expansion"
 
 ## Phase 2: Foundational (blocks all stories)
 - [x] T003 [P] Tests then `internal/model`: Sub, Variable, Environment types and validation rules (data-model.md)
-- [ ] T004 Tests then `internal/store`: `_subs`, `_shared`, `_vars`, `_envs` load/save; version 1/2 selection; referential checks (placeholders reference variables; env sets existing variables)
+- [x] T004 Tests then `internal/store`: `_subs`, `_shared`, `_vars`, `_envs` load/save; version 1/2 selection; referential checks (placeholders reference variables; env sets existing variables)
 - [ ] T005 [P] Tests then `internal/settings`: `settings.toml` and `global-env`, private permissions (ADR 0022)
 - [ ] T006 [P] Tests then `internal/expand` tokenizer: raw spans, quoted/escaped flags, command separators (research R6)
 - [ ] T007 Tests then `internal/expand` value quoting (research R7) incl. hostile-value table (SC-004)

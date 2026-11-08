@@ -19,7 +19,7 @@ const (
 	fileName    = "aliases.toml"
 	zshName     = "aliases.zsh"
 	lockName    = "aliases.toml.lock"
-	fileVersion = 1
+	fileVersion = 2
 )
 
 // Store is a handle on a config directory.
@@ -57,10 +57,11 @@ func (s *Store) ZshFile() string { return filepath.Join(s.Dir, zshName) }
 type Data struct {
 	aliases map[string]alias.Alias
 	pinned  map[string]bool
+	x       expansion
 }
 
 func newData() *Data {
-	return &Data{aliases: map[string]alias.Alias{}, pinned: map[string]bool{}}
+	return &Data{aliases: map[string]alias.Alias{}, pinned: map[string]bool{}, x: newExpansion()}
 }
 
 // Get returns the alias called name.
@@ -121,13 +122,17 @@ func parse(path string, raw []byte) (*Data, error) {
 	}
 	d := newData()
 	if v, ok := top["version"]; ok {
-		if n, ok := v.(int64); !ok || n != fileVersion {
-			return nil, fmt.Errorf("%s: unsupported version %v (this ali supports %d)", path, v, fileVersion)
+		if n, ok := v.(int64); !ok || n < 1 || n > fileVersion {
+			return nil, fmt.Errorf("%s: unsupported version %v (this ali supports up to %d)", path, v, fileVersion)
 		}
 	}
 	for key, val := range top {
 		switch key {
 		case "version":
+		case "_subs", "_shared", "_vars", "_envs":
+			if err := parseExpansion(path, key, val, d); err != nil {
+				return nil, err
+			}
 		case "_pinned":
 			t, _ := val.(map[string]any)
 			names, _ := t["names"].([]any)
@@ -164,11 +169,21 @@ func parse(path string, raw []byte) (*Data, error) {
 			delete(d.pinned, n)
 		}
 	}
+	if err := checkRefs(path, d); err != nil {
+		return nil, err
+	}
 	return d, nil
 }
 
 func (d *Data) marshal() ([]byte, error) {
-	top := map[string]any{"version": int64(fileVersion)}
+	// Version 1 unless feature-003 tables are used, so older ali versions keep
+	// working with stores that do not need the new features (ADR 0037).
+	version := int64(1)
+	if d.x.used() {
+		version = 2
+	}
+	top := map[string]any{"version": version}
+	d.x.marshalInto(top)
 	for _, a := range d.aliases {
 		t, _ := top[a.Group].(map[string]any)
 		if t == nil {
