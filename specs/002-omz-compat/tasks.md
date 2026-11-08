@@ -36,7 +36,7 @@ description: "Task list for Oh My Zsh compatibility"
 - [x] T012 [P] [US3] Tests then `internal/doctor`: checks and result model (data-model.md)
 - [x] T013 [US3] Tests then `internal/render`: wrapper pipes shell state to `ali doctor --shell-state -`
 - [x] T014 [US3] Tests then `internal/cli/doctor.go`: output and exit codes (contracts/cli.md), with Long and Example help
-- [ ] T015 [US3] E2E: each misconfiguration flagged; healthy setup passes; outside-wrapper run lists skipped checks
+- [x] T015 [US3] E2E: each misconfiguration flagged; healthy setup passes; outside-wrapper run lists skipped checks
 
 ## Phase 7: Polish
 - [ ] T016 [P] README: "Using ali with Oh My Zsh" section; update Platform support/limitations text about shadow warnings; document `ali help` and `man ali`
