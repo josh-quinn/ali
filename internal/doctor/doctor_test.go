@@ -67,16 +67,32 @@ func TestRedefinedListsNamesAndLiveValues(t *testing.T) {
 }
 
 func TestParseState(t *testing.T) {
-	m := ParseState("gp\x00git push\x00x\x00\x00")
-	if len(m) != 2 || m["gp"] != "git push" || m["x"] != "" {
-		t.Errorf("%v", m)
+	gen, m := ParseState("abc\x00gp\x00git push\x00x\x00\x00")
+	if gen != "abc" || len(m) != 2 || m["gp"] != "git push" || m["x"] != "" {
+		t.Errorf("%q %v", gen, m)
 	}
-	for _, empty := range []string{"", "\x00"} {
-		if m := ParseState(empty); m == nil || len(m) != 0 {
-			t.Errorf("ParseState(%q) = %v, want empty non-nil", empty, m)
+	for _, empty := range []string{"", "\x00", "abc\x00"} {
+		if _, m := ParseState(empty); m == nil || len(m) != 0 {
+			t.Errorf("ParseState(%q) map = %v, want empty non-nil", empty, m)
 		}
 	}
-	if m := ParseState("multi\nline\x00cmd\nwith newline\x00"); m["multi\nline"] != "cmd\nwith newline" {
+	if _, m := ParseState("g\x00multi\nline\x00cmd\nwith newline\x00"); m["multi\nline"] != "cmd\nwith newline" {
 		t.Errorf("newlines not preserved: %v", m)
+	}
+}
+
+func TestCompare(t *testing.T) {
+	store := map[string]string{"gp": "git pull", "k": "kubectl", "gone": "echo"}
+	snap := map[string]string{"gp": "git push", "k": "kubectl", "other": "x"}
+	got := Compare(store, snap)
+	if len(got) != 2 || got["gp"] != "git push" || got["gone"] != "" {
+		t.Errorf("%v", got)
+	}
+}
+
+func TestStaleSnapshotIsSkipped(t *testing.T) {
+	c := byName(Run(Input{RC: render.Block(), Overridden: map[string]string{}, SnapshotStale: true}))[CheckRedefined]
+	if c.Status != Skipped || !strings.Contains(c.Detail, "new terminal") {
+		t.Errorf("%+v", c)
 	}
 }

@@ -48,6 +48,9 @@ type Input struct {
 	// prompt when that differed from ali's definition ("" = not an alias).
 	// nil means doctor did not run through the shell wrapper.
 	Overridden map[string]string
+	// SnapshotStale means the aliases changed since this terminal started, so
+	// its startup snapshot cannot be compared with the store.
+	SnapshotStale bool
 }
 
 // Run performs every check.
@@ -97,6 +100,8 @@ func Run(in Input) []Check {
 	switch {
 	case in.Overridden == nil:
 		red = Check{Name: CheckRedefined, Status: Skipped, Detail: "run 'ali doctor' from your shell (not a script) so ali can see what your shell loaded"}
+	case in.SnapshotStale:
+		red = Check{Name: CheckRedefined, Status: Skipped, Detail: "your aliases changed since this terminal started; open a new terminal and run 'ali doctor' there"}
 	case len(in.Overridden) > 0:
 		names := make([]string, 0, len(in.Overridden))
 		for n := range in.Overridden {
@@ -141,18 +146,36 @@ func ohMyZshLine(rc string) int {
 	return 0
 }
 
-// ParseState decodes the wrapper's NUL-separated name/value pairs. It always
-// returns a non-nil map, because receiving state at all means the wrapper ran.
-func ParseState(s string) map[string]string {
-	m := map[string]string{}
+// ParseState decodes the wrapper's startup snapshot: the generation of the
+// aliases.zsh the shell loaded, then NUL-separated name/value pairs of every
+// alias the shell had at its first prompt. The map is never nil, because
+// receiving state at all means the wrapper ran.
+func ParseState(s string) (gen string, snapshot map[string]string) {
+	snapshot = map[string]string{}
 	parts := strings.Split(s, "\x00")
 	if len(parts) > 0 && parts[len(parts)-1] == "" {
 		parts = parts[:len(parts)-1]
 	}
+	if len(parts) == 0 {
+		return "", snapshot
+	}
+	gen, parts = parts[0], parts[1:]
 	for i := 0; i+1 < len(parts); i += 2 {
 		if parts[i] != "" {
-			m[parts[i]] = parts[i+1]
+			snapshot[parts[i]] = parts[i+1]
 		}
 	}
-	return m
+	return gen, snapshot
+}
+
+// Compare returns, for each ali alias whose snapshot value differs from the
+// store, what the shell had instead ("" = not an alias at all).
+func Compare(store, snapshot map[string]string) map[string]string {
+	diff := map[string]string{}
+	for name, cmd := range store {
+		if live, ok := snapshot[name]; !ok || live != cmd {
+			diff[name] = live
+		}
+	}
+	return diff
 }

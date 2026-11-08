@@ -12,13 +12,13 @@ No change to `aliases.toml`.
 `ALI_SHELL_DEF` is an internal interface between the wrapper and the binary of the same version; it is documented but not a public API.
 
 ## Shell state (wrapper to `ali doctor --shell-state -`, not persisted)
-NUL-separated pairs `name, live expansion` for each ali alias that differed from ali's definition at the first prompt (empty expansion = not an alias). NUL is used because commands may contain newlines. An empty stream still means "ran through the wrapper, nothing redefined".
+NUL-separated fields: first the generation ID of the `aliases.zsh` loaded at startup, then `name, expansion` pairs for every alias the shell had at its first prompt. NUL is used because commands may contain newlines. `doctor` compares the pairs with the store only if the generation matches the current store; otherwise the check is skipped ("open a new terminal").
 
 ## Session state in zsh (generated file, not persisted)
 - `_ali_names`: array of names ali defined (unchanged).
 - `_ali_prev`: associative array `name -> original alias text`, for originals ali overrode in this session.
-- `_ali_expected`: associative array `name -> ali's command`, rewritten on every load.
-- `_ali_overridden`: associative array filled once by `_ali_startup_check` at the first prompt.
+- `_ali_gen`: generation ID of the loaded definitions (hash of names and commands).
+- `_ali_at_start`, `_ali_gen_at_start`: copy of the alias table and generation taken once by `_ali_startup_check` at the first prompt.
 
 ## Doctor result
 | Check | Outcomes |

@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/josh-quinn/ali/internal/doctor"
+	"github.com/josh-quinn/ali/internal/render"
 	"github.com/josh-quinn/ali/internal/shellconf"
 )
 
@@ -31,12 +32,26 @@ from a script it is reported as skipped. Exits with status 1 if any check fails.
 		Args:    args(0),
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			in := doctor.Input{}
+			d, storeErr := a.st.Load()
+			in.StoreErr = storeErr
 			if state == "-" {
 				raw, err := io.ReadAll(io.LimitReader(cmd.InOrStdin(), 16<<20))
 				if err != nil {
 					return err
 				}
-				in.Overridden = doctor.ParseState(string(raw))
+				gen, snap := doctor.ParseState(string(raw))
+				in.Overridden = map[string]string{}
+				if storeErr == nil {
+					if gen != render.Gen(d.All()) {
+						in.SnapshotStale = true
+					} else {
+						want := map[string]string{}
+						for _, x := range d.All() {
+							want[x.Name] = x.Command
+						}
+						in.Overridden = doctor.Compare(want, snap)
+					}
+				}
 			}
 			if rc, err := shellconf.Path(); err != nil {
 				in.RCMissing = true
@@ -45,7 +60,6 @@ from a script it is reported as skipped. Exits with status 1 if any check fails.
 			} else {
 				in.RC = string(b)
 			}
-			_, in.StoreErr = a.st.Load()
 
 			checks := doctor.Run(in)
 			failed := 0
