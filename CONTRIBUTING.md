@@ -12,8 +12,11 @@ Thanks for helping. A few ground rules, taken from the project [constitution](.s
   spec under `specs/`.
 
 ```sh
-make test vet fmt-check     # all must pass; CI runs the same on macOS
+make check     # fmt, vet, golangci-lint, tests, govulncheck: what CI runs
 ```
+
+CI also runs CodeQL, OpenSSF Scorecard, dependency review, actionlint and
+`goreleaser check`, on macOS and Linux with Go 1.24 and the latest Go.
 
 Commits are small, single-purpose and green (`make fmt-check vet test` passes at every
 commit), written as [Conventional Commits](https://www.conventionalcommits.org/)
