@@ -8,6 +8,7 @@
 ## R1b: Startup cost (measured while implementing T018)
 - A first version looped over every alias at startup (record originals, compare with `_ali_expected`). With 1,000 aliases it added ~7 ms to interactive startup, against the 1 ms budget (SC-005).
 - **Decision**: use zsh array set operations instead: restore only `old minus new` names; record originals only for `(existing aliases ∩ new) minus old`; replace the comparison loop with one bulk copy of `$aliases` at the first prompt and do the comparison in Go. Profiled: ~0.4 ms for the intersection and ~0.45 ms for the copy, versus ~2 ms and ~1.9 ms for the loops.
+- **Result** (interactive startup, median of 4 x 40 runs, `main` vs this branch): 100 aliases +0.59 ms; 1,000 aliases +1.09 ms. SC-005 is met at typical sizes and missed by ~0.1 ms at 1,000 aliases; the remaining cost is the snapshot copy and one intersection, both needed for correctness.
 
 ## R2: Restoring overridden aliases
 - **Decision**: `aliases.zsh` keeps `typeset -gA _ali_prev`. On each load it first restores, for every previously loaded ali name, `_ali_prev[name]` if set or unaliases it otherwise; then, for each name about to be defined, records the current alias into `_ali_prev` if one exists and none is recorded; then defines ali's aliases. Assignment uses the `aliases` parameter, not the `alias` builtin.
