@@ -163,7 +163,7 @@ I can see everything available for a tool in one place and get tab completion fo
 - **FR-015**: `ali expand '<line>'` MUST print what a line would become, without running it.
 - **FR-016**: `ali show <tool>` MUST list the tool's aliases, sub-aliases, applicable shared sub-aliases and referenced variables; tab completion MUST offer sub-aliases after a tool and `@` values when placeholders are present.
 - **FR-017**: Lines that use no ali alias, sub-alias or placeholder MUST behave exactly as before.
-- **FR-019**: Every new command MUST have a summary, description and example in `--help` and a generated man page; help topics MUST explain the typed syntax: `ali help expansion` (sub-aliases, `\\word`, `--`, visible vs run-time), `ali help placeholders` (`{{name}}`, `@key`, `@var=value`) and `ali help environments` (`@@env`, terminal vs global, protection, prompt) (Constitution v1.2.0, ADR 0038).
+- **FR-019**: Every new command MUST have a summary, description and example in `--help` and a generated man page; help topics MUST explain the typed syntax: `ali help expansion` (sub-aliases, `\word`, `--`, visible vs run-time), `ali help placeholders` (`{{name}}`, `@key`, `@var=value`) and `ali help environments` (`@@env`, terminal vs global, protection, prompt) (Constitution v1.2.0, ADR 0038).
 - **FR-018**: All new definitions MUST be stored in the same human-editable store as aliases, except machine-local settings (expansion mode, global environment, prompt indicator), which MUST NOT be synced with the store.
 
 ### Key Entities
