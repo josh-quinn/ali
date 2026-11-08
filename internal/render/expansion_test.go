@@ -155,3 +155,29 @@ func TestRuntimeModeRendersFunctionsInsteadOfWidgets(t *testing.T) {
 }
 
 func noSharedRuntime() Input { in := noShared(); in.Runtime = true; return in }
+
+// Startup cost (Constitution I): nothing sourced at shell start may fork a
+// subshell or load the completion module; both cost milliseconds.
+func TestExpansionSetupStartsNoSubshell(t *testing.T) {
+	out := Render(expInput())
+	if strings.Contains(out, "bindkey") {
+		t.Error("key bindings must not be queried or changed (widgets are wrapped instead)")
+	}
+	top := out
+	for _, fn := range []string{"_ali_gate() {", "_ali_space() {", "_ali_accept() {", "_ali_tab() {", "_ali_menu_fn() {"} {
+		i := strings.Index(top, fn)
+		if i < 0 {
+			continue
+		}
+		j := strings.Index(top[i:], "\n}\n")
+		top = top[:i] + top[i+j+3:]
+	}
+	for _, f := range strings.Split(top, "\n") {
+		if strings.Contains(f, "$(") && !strings.HasPrefix(strings.TrimSpace(f), "functions[") {
+			t.Errorf("command substitution at startup: %q", f)
+		}
+		if strings.Contains(f, "zsh/complete") {
+			t.Errorf("completion module loaded at startup: %q", f)
+		}
+	}
+}

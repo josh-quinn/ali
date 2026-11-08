@@ -58,7 +58,7 @@ Each CLI task (T009, T010, T014, T019, T023, T026) includes Short, Long and Exam
 ## Phase 8: Polish
 - [ ] T029 [P] README: sub-aliases, placeholders, environments, settings; update Platform support/limitations
 - [ ] T030 [P] CHANGELOG
-- [ ] T031 Performance: SC-003 measurements recorded in research.md
+- [x] T031 Performance: SC-003 measurements recorded in research.md
 - [ ] T032 Manual compatibility pass with zsh-autosuggestions and zsh-syntax-highlighting; record result (and any limitation) in README
 
 ## Dependencies

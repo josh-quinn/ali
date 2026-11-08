@@ -51,3 +51,9 @@
 
 ## R12: Store compatibility
 - **Decision**: Write `version = 1` when no feature-003 tables are present, `version = 2` otherwise. Older ali versions reject v2 with "unsupported version" (existing behaviour), so a synced store is never corrupted by an old binary.
+
+## R13: Measured performance (T031, 2026-11-08, dev machine, 1,000 aliases + sub-aliases, a variable and an environment)
+- **Per expanding keypress** (one `ali expand` run): Space 5.35 ms median / 5.81 ms p95; Enter 5.37 / 5.81; Tab 5.27 / 5.79. Budget 15 ms (SC-003): met. Lines with no trigger word start no process (e2e-tested).
+- **Startup, first version**: the widget setup captured the previous Space and Tab bindings with `$(bindkey ...)` (a fork of the whole shell, ~3.5-4 ms each) and loaded `zsh/complete` (~2 ms). Piped `zsh -i` startup was +13.3 ms for all of ali.
+- **Decision**: wrap the widgets (`self-insert`, `magic-space`, the completion widgets, `accept-line`) instead of rebinding keys, as zsh-autosuggestions does, so no binding needs to be read; load `zsh/complete` lazily on the first Tab that has ali suggestions. A test forbids command substitution and `zsh/complete` at source time.
+- **Result**: piped `zsh -i` (no line editor): +9.4 ms for all of ali, of which ~4 ms is loading `zsh/zle` triggered by wrapping `accept-line`, which a real terminal loads anyway. In a real pseudo-terminal (zpty, line editor active): ~+1.3 ms for all of ali versus no ali. The pty timing loop is coarser than the piped one, so treat it as approximate.

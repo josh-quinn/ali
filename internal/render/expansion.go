@@ -187,37 +187,39 @@ const tabWidget = `_ali_tab() {
     _ali_cands=("${(@0)$(\command ali expand --complete -- "$LBUFFER" 2>/dev/null)}")
     _ali_cands=(${_ali_cands:#})
     if (( $#_ali_cands )); then
+      # load completion support only when ali actually has suggestions
+      if (( ! ${+widgets[_ali_menu]} )); then
+        \zmodload -i zsh/complete 2>/dev/null
+        \zle -C _ali_menu .complete-word _ali_menu_fn
+      fi
       \zle _ali_menu
       \return
     fi
   fi
-  \zle _ali_orig_tab
+  \zle _ali_orig_$WIDGET
 }
 _ali_menu_fn() { \compadd -Q -- $_ali_cands; }
-\zmodload -i zsh/zleparameter 2>/dev/null
-if (( ! ${+widgets[_ali_orig_tab]} )); then
-  \zmodload -i zsh/complete 2>/dev/null
-  _ali_tb=${${(z)"$(\bindkey -M main '^I')"}[2]}
-  [[ -z $_ali_tb || $_ali_tb == _ali_tab ]] && _ali_tb=expand-or-complete
-  \zle -A $_ali_tb _ali_orig_tab
-  \zle -C _ali_menu complete-word _ali_menu_fn
-  \zle -N _ali_tab
-  \bindkey -M main '^I' _ali_tab
-  \bindkey -M viins '^I' _ali_tab 2>/dev/null
-  \unset _ali_tb
-fi
+# Wrap the completion widgets themselves (not the Tab key), so whatever Tab is
+# bound to keeps working and no subshell is needed to find out what that is.
+for _ali_w in expand-or-complete complete-word menu-complete menu-expand-or-complete expand-or-complete-prefix; do
+  if (( ${+widgets[$_ali_w]} && ! ${+widgets[_ali_orig_$_ali_w]} )); then
+    \zle -A $_ali_w _ali_orig_$_ali_w
+    \zle -N $_ali_w _ali_tab
+  fi
+done
+\unset _ali_w
 `
 
 const widgets = `# ali: show sub-alias and placeholder expansion in the command line (ADR 0030)
 _ali_space() {
   # No PENDING check: fast typists type ahead while ali runs, and pastes do not
   # reach this widget when bracketed paste is on (the zsh default since 5.1).
-  if (( ${+_ali_subw[${${(z)LBUFFER}[-1]}]} )) && _ali_gate "$LBUFFER"; then
+  if [[ $KEYS == ' ' ]] && (( ${+_ali_subw[${${(z)LBUFFER}[-1]}]} )) && _ali_gate "$LBUFFER"; then
     \local -a _r
     _r=("${(@0)$(\command ali expand --zle space -- "$LBUFFER" 2>/dev/null)}")
     [[ $_r[1] == ok ]] && LBUFFER=$_r[2]
   fi
-  \zle _ali_orig_space
+  \zle _ali_orig_$WIDGET
 }
 _ali_accept() {
   if [[ -n $_ali_pending && $BUFFER == "$_ali_pending" ]]; then
@@ -251,12 +253,15 @@ if (( ! ${+widgets[_ali_orig_accept]} )); then
   \zle -A accept-line _ali_orig_accept
   \zle -N accept-line _ali_accept
   \zle -N _ali_accept
-  _ali_sp=${${(z)"$(\bindkey -M main ' ')"}[2]}
-  [[ -z $_ali_sp || $_ali_sp == _ali_space ]] && _ali_sp=self-insert
-  \zle -A $_ali_sp _ali_orig_space
-  \zle -N _ali_space
-  \bindkey -M main ' ' _ali_space
-  \bindkey -M viins ' ' _ali_space 2>/dev/null
-  \unset _ali_sp
 fi
+# Space: wrap the widgets that insert it (self-insert, magic-space) rather than
+# rebinding the key, so the user's binding keeps working and no subshell is
+# needed at startup. Every other key passes straight through.
+for _ali_w in self-insert magic-space; do
+  if (( ! ${+widgets[_ali_orig_$_ali_w]} )); then
+    \zle -A $_ali_w _ali_orig_$_ali_w
+    \zle -N $_ali_w _ali_space
+  fi
+done
+\unset _ali_w
 `
