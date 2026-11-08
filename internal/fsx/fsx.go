@@ -37,17 +37,18 @@ func WriteAtomic(path string, data []byte, perm os.FileMode) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(tmp.Name())
+	// After a successful rename the temp name no longer exists; ignore that error.
+	defer func() { _ = os.Remove(tmp.Name()) }()
 	if _, err := tmp.Write(data); err != nil {
-		tmp.Close()
+		_ = tmp.Close() // the write error is the one worth reporting
 		return err
 	}
 	if err := tmp.Chmod(perm); err != nil {
-		tmp.Close()
+		_ = tmp.Close() // the write error is the one worth reporting
 		return err
 	}
 	if err := tmp.Sync(); err != nil {
-		tmp.Close()
+		_ = tmp.Close() // the write error is the one worth reporting
 		return err
 	}
 	if err := tmp.Close(); err != nil {

@@ -32,7 +32,7 @@ prints a warning and still creates the alias.`,
   ali add gp 'git pull --rebase' --force
   ali add hi "echo 'hello world'"        # inner quotes are kept verbatim`,
 		Args: args(2),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		RunE: func(_ *cobra.Command, argv []string) error {
 			name, command := argv[0], argv[1]
 			if err := alias.ValidateName(name); err != nil {
 				return err

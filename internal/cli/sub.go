@@ -192,7 +192,7 @@ func (a *app) subRmCmd() *cobra.Command {
 		Example: `  ali sub rm kubectl g p
   ali sub rm --shared o`,
 		Args: minArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			tool, names, err := subTarget(shared, args)
 			if err != nil {
 				return err
@@ -246,7 +246,7 @@ func (a *app) subLsCmd() *cobra.Command {
   ali sub ls kubectl
   ali sub ls --json`,
 		Args: maxArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err

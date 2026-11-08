@@ -37,6 +37,7 @@ type Result struct {
 // BlockState says whether, and in what shape, an rc file contains the ali block.
 type BlockState int
 
+// Block states returned by Inspect.
 const (
 	BlockMissing  BlockState = iota // no markers
 	BlockCurrent                    // exactly one block, identical to render.Block()
@@ -82,7 +83,7 @@ func Inspect(content string) (state BlockState, startLine int, span [2]int) {
 
 // Backup copies path to <path>.ali-backup-<timestamp>, preserving its mode.
 func Backup(path string) (string, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) // #nosec G304 -- reading the user's own config file is the purpose
 	if err != nil {
 		return "", err
 	}
@@ -98,7 +99,7 @@ func Backup(path string) (string, error) {
 // place (ADR 0029). Content outside the block is never changed; a damaged block
 // is refused without writing anything.
 func Install(path string) (Result, error) {
-	cur, err := os.ReadFile(path)
+	cur, err := os.ReadFile(path) // #nosec G304 -- reading the user's own config file is the purpose
 	if err != nil && !os.IsNotExist(err) {
 		return Result{}, err
 	}

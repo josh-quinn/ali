@@ -42,7 +42,7 @@ func Tokenize(line string) []Command {
 			flush()
 			i++
 			continue
-		case c == '|' || (c == '&' && !(i+1 < n && line[i+1] == '>')):
+		case c == '|' || (c == '&' && (i+1 >= n || line[i+1] != '>')):
 			flush()
 			i++
 			continue

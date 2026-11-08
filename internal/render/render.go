@@ -141,9 +141,9 @@ ali() {
       elif [[ $_e =~ '^[a-z][a-z0-9_-]*$' ]]; then
         \export ALI_ENV=$_e
       fi
-      \true
+      \builtin true
     else
-      \false
+      \builtin false
     fi
   elif [[ $1 == add && -n $2 ]]; then
     \local _d=

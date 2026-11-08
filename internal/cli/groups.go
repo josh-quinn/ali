@@ -17,7 +17,7 @@ machine-readable output.`,
 		Example: `  ali groups
   ali groups --json`,
 		Args: args(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err

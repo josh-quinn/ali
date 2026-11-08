@@ -13,6 +13,7 @@ const EnvVar = "ALI_SHELL_DEF"
 // Kind of definition a name has in the shell.
 type Kind int
 
+// Kinds of shell definitions.
 const (
 	None     Kind = iota // free, unknown, or not run through the wrapper
 	Alias                // a non-ali alias

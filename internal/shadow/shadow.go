@@ -31,7 +31,8 @@ func Shadows(name string) string {
 			continue
 		}
 		p := filepath.Join(dir, name)
-		if st, err := os.Stat(p); err == nil && !st.IsDir() && st.Mode()&0o111 != 0 {
+		// Looking names up on $PATH is the purpose here; name is a validated alias name.
+		if st, err := os.Stat(p); err == nil && !st.IsDir() && st.Mode()&0o111 != 0 { // #nosec G703 G304
 			return p
 		}
 	}

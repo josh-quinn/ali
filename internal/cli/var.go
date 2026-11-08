@@ -74,7 +74,7 @@ sets the variable.`,
 		Example: `  ali var add ns one=namespace-1 sys=kube-system --default one
   ali var add ctx dev=dev-cluster prod=prod-cluster`,
 		Args: minArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			name := args[0]
 			if err := model.ValidateVarName(name); err != nil {
 				return err
@@ -108,7 +108,7 @@ func (a *app) varSetCmd() *cobra.Command {
 		Long:    `Add new named values to variable NAME, or change existing ones.`,
 		Example: `  ali var set ns dev=dev-namespace`,
 		Args:    minArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			vals, err := parseKV(args[1:], model.ValidateKey)
 			if err != nil {
 				return err
@@ -131,7 +131,7 @@ func (a *app) varUnsetCmd() *cobra.Command {
 		Long:    `Remove named values from variable NAME. Removing the default value also clears the default.`,
 		Example: `  ali var unset ns dev`,
 		Args:    minArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			return a.withVar(args[0], func(_ *store.Data, v *model.Variable) error {
 				for _, k := range args[1:] {
 					if _, ok := v.Values[k]; !ok {
@@ -164,7 +164,7 @@ func (a *app) varDefaultCmd() *cobra.Command {
 			}
 			return nil
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			return a.withVar(args[0], func(_ *store.Data, v *model.Variable) error {
 				if none {
 					v.Default = ""
@@ -190,7 +190,7 @@ func (a *app) varRmCmd() *cobra.Command {
 		Long:    `Remove variable NAME. This is refused while any alias, sub-alias or environment still uses it; the message lists them.`,
 		Example: `  ali var rm ns`,
 		Args:    args(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			return a.st.Update(func(d *store.Data) error {
 				if _, ok := d.Var(args[0]); !ok {
 					return fmt.Errorf("no variable %q", args[0])
@@ -259,7 +259,7 @@ func (a *app) varLsCmd() *cobra.Command {
 		Example: `  ali var ls
   ali var ls --json`,
 		Args: args(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err
@@ -292,7 +292,7 @@ func (a *app) varShowCmd() *cobra.Command {
 		Long:    `Show variable NAME's values (default marked) and the aliases, sub-aliases and environments that use it.`,
 		Example: `  ali var show ns`,
 		Args:    args(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err

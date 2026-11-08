@@ -14,10 +14,11 @@ import (
 // Status of one check.
 type Status int
 
+// Check outcomes.
 const (
-	OK Status = iota
-	Fail
-	Skipped
+	OK      Status = iota // the check passed
+	Fail                  // the check failed; Fix says what to do
+	Skipped               // the check could not run (see Detail)
 )
 
 func (s Status) String() string { return [...]string{"ok", "FAIL", "skipped"}[s] }

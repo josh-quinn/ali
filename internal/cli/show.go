@@ -31,7 +31,7 @@ variables those use. Use "ali var show NAME" for a variable's values.`,
 		Example: `  ali show kubectl
   ali show helm --json`,
 		Args: args(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err

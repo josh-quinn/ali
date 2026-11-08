@@ -69,7 +69,7 @@ The ali shell integration also uses this command internally (--zle).`,
 			}
 			return nil
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			if zle != "" {
 				return a.expandZle(zle, args[0])
 			}
@@ -195,7 +195,7 @@ func confirmOnTTY(res expand.Result) error {
 	if err != nil {
 		return fmt.Errorf("environment %q is protected and there is no terminal to confirm on; not running: %s", res.Env, display(res.Line))
 	}
-	defer tty.Close()
+	defer func() { _ = tty.Close() }()
 	fmt.Fprintf(tty, "ali: environment %q is protected.\n  %s\nRun it? [y/N] ", res.Env, display(res.Line))
 	answer, _ := bufio.NewReader(tty).ReadString('\n')
 	if a := strings.ToLower(strings.TrimSpace(answer)); a != "y" && a != "yes" {

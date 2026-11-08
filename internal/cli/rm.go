@@ -19,7 +19,7 @@ still removed. There is no confirmation prompt.`,
 		Example: `  ali rm gp
   ali rm gp gs hgp`,
 		Args: minArgs(1),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		RunE: func(_ *cobra.Command, argv []string) error {
 			var missing []string
 			err := a.st.Update(func(d *store.Data) error {
 				for _, name := range argv {

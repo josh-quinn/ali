@@ -25,7 +25,7 @@ supported.`,
 		Example: `  ali init zsh --dry-run
   ali init zsh`,
 		Args: args(1),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		RunE: func(_ *cobra.Command, argv []string) error {
 			if argv[0] != "zsh" {
 				return &UsageError{fmt.Errorf("unsupported shell %q (only zsh for now)", argv[0])}
 			}

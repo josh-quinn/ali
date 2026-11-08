@@ -29,7 +29,7 @@ func (a *app) configCmd() *cobra.Command {
 		Long:    `Print the value of setting KEY (expand or prompt).`,
 		Example: `  ali config get expand`,
 		Args:    args(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			s, err := settings.Load(a.st.Dir)
 			if err != nil {
 				return err
@@ -48,7 +48,7 @@ func (a *app) configCmd() *cobra.Command {
 		Example: `  ali config set expand runtime
   ali config set prompt off`,
 		Args: args(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			s, err := settings.Load(a.st.Dir)
 			if err != nil {
 				return err
@@ -72,7 +72,7 @@ func (a *app) configCmd() *cobra.Command {
 		Long:    `List every setting and its current value.`,
 		Example: `  ali config ls`,
 		Args:    args(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			s, err := settings.Load(a.st.Dir)
 			if err != nil {
 				return err

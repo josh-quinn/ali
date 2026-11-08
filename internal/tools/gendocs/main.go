@@ -30,7 +30,8 @@ func main() {
 }
 
 func generate(dir, version string) error {
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	// Man pages are meant to be world-readable once installed.
+	if err := os.MkdirAll(dir, 0o755); err != nil { // #nosec G301
 		return err
 	}
 	// The store is never touched while generating docs.
@@ -53,7 +54,7 @@ func generate(dir, version string) error {
 		if !c.IsAdditionalHelpTopicCommand() {
 			continue
 		}
-		f, err := os.Create(filepath.Join(dir, "ali-"+c.Name()+".7"))
+		f, err := os.Create(filepath.Join(dir, "ali-"+c.Name()+".7")) // #nosec G304 -- dir is the build's output directory
 		if err != nil {
 			return err
 		}

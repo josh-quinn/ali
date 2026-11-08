@@ -117,7 +117,7 @@ func TestInvalidFilesError(t *testing.T) {
 		}
 		// a failed update must not overwrite the broken file
 		before, _ := os.ReadFile(s.File())
-		s.Update(func(d *Data) error { return nil })
+		s.Update(func(*Data) error { return nil })
 		after, _ := os.ReadFile(s.File())
 		if string(before) != string(after) {
 			t.Errorf("%s: invalid store was overwritten", name)

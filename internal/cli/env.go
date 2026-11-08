@@ -69,7 +69,7 @@ the environment's values wait for a second Enter.`,
 		Example: `  ali env add dev ns=one ctx=dev
   ali env add prod ns=production ctx=prod --protect`,
 		Args: minArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			if err := model.ValidateEnvName(args[0]); err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ func (a *app) envSetCmd() *cobra.Command {
 		Long:    `Add or change variable assignments in environment NAME.`,
 		Example: `  ali env set dev ns=sys`,
 		Args:    minArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			return a.withEnv(args[0], func(d *store.Data, e *model.Environment) error {
 				set, err := a.parseEnvSet(d, args[1:])
 				if err != nil {
@@ -121,7 +121,7 @@ func (a *app) envUnsetCmd() *cobra.Command {
 		Long:    `Stop environment NAME from setting the given variables.`,
 		Example: `  ali env unset dev ctx`,
 		Args:    minArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			return a.withEnv(args[0], func(_ *store.Data, e *model.Environment) error {
 				for _, v := range args[1:] {
 					if _, ok := e.Set[v]; !ok {
@@ -148,7 +148,7 @@ func (a *app) envProtectCmd(on bool) *cobra.Command {
 		Long:    long,
 		Example: "  ali env " + strings.Fields(use)[0] + " prod",
 		Args:    args(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			return a.withEnv(args[0], func(_ *store.Data, e *model.Environment) error {
 				e.Protected = on
 				fmt.Fprintf(a.out, "updated environment %s\n", args[0])
@@ -167,7 +167,7 @@ Terminals that chose it themselves fall back to no environment, with a warning, 
 next time a command needs it.`,
 		Example: `  ali env rm staging`,
 		Args:    args(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			if err := a.st.Update(func(d *store.Data) error {
 				if !d.DeleteEnv(args[0]) {
 					return fmt.Errorf("no environment %q", args[0])
@@ -215,7 +215,7 @@ func (a *app) envLsCmd() *cobra.Command {
 		Example: `  ali env ls
   ali env ls --json`,
 		Args: args(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err
@@ -258,7 +258,7 @@ func (a *app) envShowCmd() *cobra.Command {
 		Example: `  ali env show prod
   ali env show`,
 		Args: maxArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err
@@ -314,7 +314,7 @@ this from your shell.`,
 		Example: `  ali env use prod
   ali env use dev --global`,
 		Args: args(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err
@@ -350,7 +350,7 @@ func (a *app) envOffCmd() *cobra.Command {
 		Example: `  ali env off
   ali env off --global`,
 		Args: args(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if global {
 				if err := settings.SetGlobalEnv(a.st.Dir, ""); err != nil {
 					return err
@@ -373,7 +373,7 @@ func (a *app) envCurrentCmd() *cobra.Command {
 		Long:    `Print the environment in effect for this terminal and where it comes from: "this terminal", "global", or none.`,
 		Example: `  ali env current`,
 		Args:    args(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			name, from := a.active()
 			if name == "" {
 				fmt.Fprintln(a.out, "none")

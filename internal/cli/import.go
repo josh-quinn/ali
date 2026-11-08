@@ -28,7 +28,7 @@ definitions on one line, unquoted ; | & < > ( )) are reported, never guessed.`,
   ali import
   ali import --file ~/.oh-my-zsh/custom/aliases.zsh`,
 		Args: args(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if file == "" {
 				p, err := shellconf.Path()
 				if err != nil {
@@ -36,7 +36,7 @@ definitions on one line, unquoted ; | & < > ( )) are reported, never guessed.`,
 				}
 				file = p
 			}
-			src, err := os.ReadFile(file)
+			src, err := os.ReadFile(file) // #nosec G304 -- reading the user's own config file is the purpose
 			if err != nil {
 				return err
 			}

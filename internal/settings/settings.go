@@ -85,7 +85,7 @@ func (s *Settings) SetKey(key, value string) error {
 // Load reads settings.toml, filling defaults for anything unset.
 func Load(dir string) (Settings, error) {
 	s := Defaults()
-	raw, err := os.ReadFile(filepath.Join(dir, FileName))
+	raw, err := os.ReadFile(filepath.Join(dir, FileName)) // #nosec G304 -- reading the user's own config file is the purpose
 	if os.IsNotExist(err) {
 		return s, nil
 	}
@@ -121,7 +121,7 @@ func Save(dir string, s Settings) error {
 // GlobalEnv returns the global environment name, or "" if none. The prompt
 // hook reads the same file directly in zsh, so it holds just the name.
 func GlobalEnv(dir string) (string, error) {
-	raw, err := os.ReadFile(filepath.Join(dir, GlobalEnvFile))
+	raw, err := os.ReadFile(filepath.Join(dir, GlobalEnvFile)) // #nosec G304 -- reading the user's own config file is the purpose
 	if os.IsNotExist(err) {
 		return "", nil
 	}

@@ -16,7 +16,7 @@ func (a *app) regroupCmd() *cobra.Command {
 choice is kept when the command is updated later.`,
 		Example: `  ali regroup hgp k8s`,
 		Args:    args(2),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		RunE: func(_ *cobra.Command, argv []string) error {
 			name, grp := argv[0], argv[1]
 			if err := alias.ValidateGroup(grp); err != nil {
 				return err

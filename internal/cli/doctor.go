@@ -56,7 +56,7 @@ from a script it is reported as skipped. Exits with status 1 if any check fails.
 			}
 			if rc, err := shellconf.Path(); err != nil {
 				in.RCMissing = true
-			} else if b, err := os.ReadFile(rc); err != nil {
+			} else if b, err := os.ReadFile(rc); err != nil { // #nosec G304 -- reading the user's own config file is the purpose
 				in.RCMissing = true
 			} else {
 				in.RC = string(b)

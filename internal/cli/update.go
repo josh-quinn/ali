@@ -17,7 +17,7 @@ func (a *app) updateCmd() *cobra.Command {
 command unless you set it explicitly with "ali add -g" or "ali regroup".`,
 		Example: `  ali update gp 'git pull --rebase'`,
 		Args:    args(2),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		RunE: func(_ *cobra.Command, argv []string) error {
 			name, command := argv[0], argv[1]
 			if err := alias.ValidateCommand(command); err != nil {
 				return err

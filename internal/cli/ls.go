@@ -20,7 +20,7 @@ shown as escapes such as \x1b. Use --json for machine-readable output.`,
   ali ls helm
   ali ls --json | jq -r '.[].name'`,
 		Args: maxArgs(1),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		RunE: func(_ *cobra.Command, argv []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err
