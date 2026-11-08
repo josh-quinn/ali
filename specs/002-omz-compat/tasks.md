@@ -40,7 +40,7 @@ description: "Task list for Oh My Zsh compatibility"
 
 ## Phase 7: Polish
 - [x] T016 [P] README: "Using ali with Oh My Zsh" section; update Platform support/limitations text about shadow warnings; document `ali help` and `man ali`
-- [ ] T017 [P] CHANGELOG entry
+- [x] T017 [P] CHANGELOG entry
 - [ ] T018 Run quickstart.md; verify SC-001..SC-005 (startup delta < 1 ms)
 
 ## Dependencies
