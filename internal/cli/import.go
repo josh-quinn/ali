@@ -17,10 +17,18 @@ func (a *app) importCmd() *cobra.Command {
 	var file string
 	var dry bool
 	cmd := &cobra.Command{
-		Use:   "import [--file path] [--dry-run]",
+		Use:   "import [--file PATH] [--dry-run]",
 		Short: "Copy existing `alias` lines from your .zshrc into ali (originals are left alone)",
-		Args:  args(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		Long: `Read simple "alias name=value" lines from your .zshrc (or --file) and add them to
+ali, grouped automatically. Your file is never modified: ali prints the lines you
+can delete afterwards. Names already in ali are skipped. Lines ali cannot read with
+certainty (multi-line values, $ or backticks inside double quotes, alias -g, several
+definitions on one line, unquoted ; | & < > ( )) are reported, never guessed.`,
+		Example: `  ali import --dry-run
+  ali import
+  ali import --file ~/.oh-my-zsh/custom/aliases.zsh`,
+		Args: args(0),
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if file == "" {
 				p, err := shellconf.Path()
 				if err != nil {
@@ -28,7 +36,7 @@ func (a *app) importCmd() *cobra.Command {
 				}
 				file = p
 			}
-			src, err := os.ReadFile(file)
+			src, err := os.ReadFile(file) // #nosec G304 -- reading the user's own config file is the purpose
 			if err != nil {
 				return err
 			}

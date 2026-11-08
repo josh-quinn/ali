@@ -12,6 +12,7 @@ import (
 	"github.com/pelletier/go-toml/v2"
 
 	"github.com/josh-quinn/ali/internal/alias"
+	"github.com/josh-quinn/ali/internal/fsx"
 	"github.com/josh-quinn/ali/internal/render"
 )
 
@@ -19,7 +20,7 @@ const (
 	fileName    = "aliases.toml"
 	zshName     = "aliases.zsh"
 	lockName    = "aliases.toml.lock"
-	fileVersion = 1
+	fileVersion = 2
 )
 
 // Store is a handle on a config directory.
@@ -57,10 +58,11 @@ func (s *Store) ZshFile() string { return filepath.Join(s.Dir, zshName) }
 type Data struct {
 	aliases map[string]alias.Alias
 	pinned  map[string]bool
+	x       expansion
 }
 
 func newData() *Data {
-	return &Data{aliases: map[string]alias.Alias{}, pinned: map[string]bool{}}
+	return &Data{aliases: map[string]alias.Alias{}, pinned: map[string]bool{}, x: newExpansion()}
 }
 
 // Get returns the alias called name.
@@ -121,13 +123,17 @@ func parse(path string, raw []byte) (*Data, error) {
 	}
 	d := newData()
 	if v, ok := top["version"]; ok {
-		if n, ok := v.(int64); !ok || n != fileVersion {
-			return nil, fmt.Errorf("%s: unsupported version %v (this ali supports %d)", path, v, fileVersion)
+		if n, ok := v.(int64); !ok || n < 1 || n > fileVersion {
+			return nil, fmt.Errorf("%s: unsupported version %v (this ali supports up to %d)", path, v, fileVersion)
 		}
 	}
 	for key, val := range top {
 		switch key {
 		case "version":
+		case "_subs", "_shared", "_vars", "_envs":
+			if err := parseExpansion(path, key, val, d); err != nil {
+				return nil, err
+			}
 		case "_pinned":
 			t, _ := val.(map[string]any)
 			names, _ := t["names"].([]any)
@@ -164,11 +170,21 @@ func parse(path string, raw []byte) (*Data, error) {
 			delete(d.pinned, n)
 		}
 	}
+	if err := checkRefs(path, d); err != nil {
+		return nil, err
+	}
 	return d, nil
 }
 
 func (d *Data) marshal() ([]byte, error) {
-	top := map[string]any{"version": int64(fileVersion)}
+	// Version 1 unless feature-003 tables are used, so older ali versions keep
+	// working with stores that do not need the new features (ADR 0037).
+	version := int64(1)
+	if d.x.used() {
+		version = 2
+	}
+	top := map[string]any{"version": version}
+	d.x.marshalInto(top)
 	for _, a := range d.aliases {
 		t, _ := top[a.Group].(map[string]any)
 		if t == nil {
@@ -203,11 +219,11 @@ func (s *Store) Update(fn func(*Data) error) error {
 	if err != nil {
 		return err
 	}
-	defer lock.Close()
+	defer func() { _ = lock.Close() }() // closing also releases the lock
 	if err := syscall.Flock(int(lock.Fd()), syscall.LOCK_EX); err != nil {
 		return err
 	}
-	defer syscall.Flock(int(lock.Fd()), syscall.LOCK_UN)
+	defer func() { _ = syscall.Flock(int(lock.Fd()), syscall.LOCK_UN) }()
 
 	d, err := s.Load()
 	if err != nil {
@@ -223,54 +239,10 @@ func (s *Store) Update(fn func(*Data) error) error {
 	if err := WriteAtomic(s.File(), body, 0o600); err != nil {
 		return err
 	}
-	return WriteAtomic(s.ZshFile(), []byte(render.Zsh(d.All())), 0o600)
+	return WriteAtomic(s.ZshFile(), []byte(render.Render(s.RenderInput(d))), 0o600)
 }
 
-// resolve follows symlinks so a symlinked file (stow, chezmoi, a dotfiles repo)
-// is updated in place instead of being replaced by a regular file. A dangling
-// symlink resolves to where it points, so the target gets created.
-func resolve(path string) string {
-	for i := 0; i < 16; i++ {
-		fi, err := os.Lstat(path)
-		if err != nil || fi.Mode()&os.ModeSymlink == 0 {
-			return path
-		}
-		next, err := os.Readlink(path)
-		if err != nil {
-			return path
-		}
-		if !filepath.IsAbs(next) {
-			next = filepath.Join(filepath.Dir(path), next)
-		}
-		path = next
-	}
-	return path
-}
-
-// WriteAtomic writes data to path via a temp file in the same directory,
-// fsyncs, then renames, so readers never see a partial file. Symlinks are
-// followed (see resolve).
+// WriteAtomic writes data to path atomically, following symlinks (see fsx).
 func WriteAtomic(path string, data []byte, perm os.FileMode) error {
-	path = resolve(path)
-	tmp, err := os.CreateTemp(filepath.Dir(path), "."+filepath.Base(path)+".tmp*")
-	if err != nil {
-		return err
-	}
-	defer os.Remove(tmp.Name())
-	if _, err := tmp.Write(data); err != nil {
-		tmp.Close()
-		return err
-	}
-	if err := tmp.Chmod(perm); err != nil {
-		tmp.Close()
-		return err
-	}
-	if err := tmp.Sync(); err != nil {
-		tmp.Close()
-		return err
-	}
-	if err := tmp.Close(); err != nil {
-		return err
-	}
-	return os.Rename(tmp.Name(), path)
+	return fsx.WriteAtomic(path, data, perm)
 }

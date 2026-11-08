@@ -3,6 +3,7 @@ project_name: ali
 before:
   hooks:
     - go mod tidy
+    - go run ./internal/tools/gendocs -out man -version {{ .Version }}
 builds:
   - main: ./cmd/ali
     binary: ali
@@ -13,14 +14,35 @@ builds:
 archives:
   - formats: [tar.gz]
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+      - man/*
+release:
+  github:
+    owner: josh-quinn
+    name: ali
 checksum:
   name_template: checksums.txt
 changelog:
   sort: asc
-brews:
-  - repository:
+homebrew_casks:
+  - name: ali
+    repository:
       owner: josh-quinn
       name: homebrew-tap
     homepage: https://github.com/josh-quinn/ali
     description: Create, find and organise shell aliases without touching .zshrc
     license: MIT
+    binaries: [ali]
+    manpages:
+      - man/*.1
+      - man/*.7
+    hooks:
+      post:
+        # The binary is not notarized; clear the download quarantine so macOS
+        # lets it run (see goreleaser.com/customization/homebrew_casks).
+        install_steps: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/ali"]
+          end

@@ -117,7 +117,7 @@ func TestInvalidFilesError(t *testing.T) {
 		}
 		// a failed update must not overwrite the broken file
 		before, _ := os.ReadFile(s.File())
-		s.Update(func(d *Data) error { return nil })
+		s.Update(func(*Data) error { return nil })
 		after, _ := os.ReadFile(s.File())
 		if string(before) != string(after) {
 			t.Errorf("%s: invalid store was overwritten", name)
@@ -200,5 +200,41 @@ func TestDirResolutionNeverFallsBackToTheWorkingDirectory(t *testing.T) {
 	t.Setenv("HOME", "/h")
 	if d, _ := DefaultDir(); d != "/h/.config/ali" {
 		t.Errorf("relative XDG_CONFIG_HOME not ignored: %q", d)
+	}
+}
+
+func TestStoreFilesArePrivate(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "cfg")
+	s := New(dir)
+	if err := s.Update(func(d *Data) error {
+		d.Set(alias.Alias{Name: "deploy", Command: "TOKEN=abc123 curl https://x", Group: "curl"}, false)
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	mode := func(p string) os.FileMode { st, _ := os.Stat(p); return st.Mode().Perm() }
+	if m := mode(dir); m != 0o700 {
+		t.Errorf("config dir mode %v, want 0700", m)
+	}
+	for _, f := range []string{s.File(), s.ZshFile(), filepath.Join(dir, lockName)} {
+		if m := mode(f); m != 0o600 {
+			t.Errorf("%s mode %v, want 0600", filepath.Base(f), m)
+		}
+	}
+}
+
+func TestExistingLooseFilesAreTightenedButSharedDirIsLeftAlone(t *testing.T) {
+	dir := t.TempDir() // already exists, may be shared: must not be chmod'ed
+	os.Chmod(dir, 0o755)
+	s := New(dir)
+	os.WriteFile(s.File(), []byte("version = 1\n"), 0o644)
+	if err := s.Update(func(d *Data) error { return nil }); err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := os.Stat(s.File()); st.Mode().Perm() != 0o600 {
+		t.Errorf("store mode %v, want 0600", st.Mode().Perm())
+	}
+	if st, _ := os.Stat(dir); st.Mode().Perm() != 0o755 {
+		t.Errorf("pre-existing dir mode changed to %v", st.Mode().Perm())
 	}
 }

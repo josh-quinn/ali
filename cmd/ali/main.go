@@ -1,3 +1,5 @@
+// Command ali creates, finds and organises shell aliases, sub-aliases,
+// placeholders and environments for zsh. See README.md and "ali --help".
 package main
 
 import (

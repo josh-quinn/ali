@@ -12,7 +12,7 @@ as the change it records.
 | [0004](0004-implement-in-go-as-a-single-static-binary.md) | Implement in Go as a single static binary | Accepted |
 | [0005](0005-name-the-command-ali.md) | Name the command ali | Accepted |
 | [0006](0006-depend-only-on-cobra-and-go-toml.md) | Depend only on cobra and go-toml | Accepted |
-| [0007](0007-release-under-mit-via-goreleaser-and-a-homebrew-tap.md) | Release under MIT via GoReleaser and a Homebrew tap | Accepted |
+| [0007](0007-release-under-mit-via-goreleaser-and-a-homebrew-tap.md) | Release under MIT via GoReleaser and a Homebrew tap | Superseded by [0039](0039-distribute-with-a-homebrew-cask-built-by-goreleaser.md) |
 | [0008](0008-group-aliases-by-the-first-real-word-of-the-command.md) | Group aliases by the first real word of the command | Accepted |
 | [0009](0009-store-aliases-as-hand-editable-toml.md) | Store aliases as hand-editable TOML | Accepted |
 | [0010](0010-generate-aliases-zsh-and-source-it-from-zshrc.md) | Generate aliases.zsh and source it from .zshrc | Accepted |
@@ -31,4 +31,19 @@ as the change it records.
 | [0023](0023-write-through-symlinks-instead-of-replacing-them.md) | Write through symlinks instead of replacing them | Accepted |
 | [0024](0024-refuse-to-guess-locations-when-home-is-unset.md) | Refuse to guess locations when HOME is unset | Accepted |
 | [0025](0025-escape-control-characters-when-printing-stored-text-and-reject-nul.md) | Escape control characters when printing stored text and reject NUL | Accepted |
-| [0026](0026-harden-ci-and-keep-dependencies-patched.md) | Harden CI and keep dependencies patched | Accepted |
+| [0026](0026-harden-ci-and-keep-dependencies-patched.md) | Harden CI and keep dependencies patched | Superseded by [0040](0040-gate-every-change-with-free-open-source-quality-and-security-checks.md) |
+| [0027](0027-learn-about-the-live-shell-through-the-wrapper.md) | Learn about the live shell through the wrapper | Accepted |
+| [0028](0028-remember-overridden-aliases-in-the-shell-session.md) | Remember overridden aliases in the shell session | Accepted |
+| [0029](0029-upgrade-the-managed-block-in-place.md) | Upgrade the managed block in place | Accepted |
+| [0030](0030-show-expansions-in-the-command-line-by-default.md) | Show expansions in the command line by default | Accepted |
+| [0031](0031-scope-sub-aliases-to-the-tool-and-expand-them-anywhere-in-the-command.md) | Scope sub-aliases to the tool and expand them anywhere in the command | Accepted |
+| [0032](0032-use-named-name-placeholders-recognised-only-for-defined-variables.md) | Use named {{name}} placeholders recognised only for defined variables | Accepted |
+| [0033](0033-use-for-call-time-values-and-for-a-one-off-environment.md) | Use @ for call-time values and @@ for a one-off environment | Accepted |
+| [0034](0034-choose-environments-per-terminal-by-default-globally-by-flag-and-always-show-them.md) | Choose environments per terminal by default, globally by flag, and always show them | Accepted |
+| [0035](0035-one-expansion-engine-in-go-behind-thin-gated-zsh-widgets.md) | One expansion engine in Go behind thin, gated zsh widgets | Accepted |
+| [0036](0036-insert-substituted-values-as-single-literal-words.md) | Insert substituted values as single literal words | Accepted |
+| [0037](0037-store-format-v2-only-when-used-with-machine-local-settings-kept-separate.md) | Store format v2 only when used, with machine-local settings kept separate | Accepted |
+| [0038](0038-generate-help-and-man-pages-from-the-command-tree.md) | Generate help and man pages from the command tree | Accepted |
+| [0039](0039-distribute-with-a-homebrew-cask-built-by-goreleaser.md) | Distribute with a Homebrew cask built by GoReleaser | Accepted |
+| [0040](0040-gate-every-change-with-free-open-source-quality-and-security-checks.md) | Gate every change with free, open-source quality and security checks | Accepted |
+| [0041](0041-scan-for-secrets-before-every-push-and-again-in-ci.md) | Scan for secrets before every push and again in CI | Accepted |

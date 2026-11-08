@@ -10,10 +10,13 @@ import (
 
 func (a *app) regroupCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "regroup <name> <group>",
+		Use:   "regroup NAME GROUP",
 		Short: "Move an alias to another group",
-		Args:  args(2),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		Long: `Move alias NAME to GROUP. Groups are lowercase letters, digits, - and _. The
+choice is kept when the command is updated later.`,
+		Example: `  ali regroup hgp k8s`,
+		Args:    args(2),
+		RunE: func(_ *cobra.Command, argv []string) error {
 			name, grp := argv[0], argv[1]
 			if err := alias.ValidateGroup(grp); err != nil {
 				return err

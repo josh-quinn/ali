@@ -10,11 +10,17 @@ import (
 func (a *app) lsCmd() *cobra.Command {
 	var asJSON bool
 	cmd := &cobra.Command{
-		Use:     "ls [group]",
+		Use:     "ls [GROUP]",
 		Aliases: []string{"list"},
 		Short:   "List aliases, grouped (optionally only one group)",
-		Args:    maxArgs(1),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		Long: `List all aliases under group headings, sorted by group and name, with commands
+aligned. Give a GROUP to list only that group. Control characters in commands are
+shown as escapes such as \x1b. Use --json for machine-readable output.`,
+		Example: `  ali ls
+  ali ls helm
+  ali ls --json | jq -r '.[].name'`,
+		Args: maxArgs(1),
+		RunE: func(_ *cobra.Command, argv []string) error {
 			d, err := a.st.Load()
 			if err != nil {
 				return err

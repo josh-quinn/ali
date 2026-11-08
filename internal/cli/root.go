@@ -3,10 +3,13 @@
 package cli
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -29,24 +32,37 @@ func IsUsage(err error) bool { var u *UsageError; return asUsage(err, &u) }
 type app struct {
 	st       *store.Store
 	out, err io.Writer
+	root     *cobra.Command
 }
 
 // NewRoot builds the ali command tree writing to out and errw.
 func NewRoot(version string, st *store.Store, out, errw io.Writer) *cobra.Command {
 	a := &app{st: st, out: out, err: errw}
 	root := &cobra.Command{
-		Use:           "ali",
-		Short:         "Create, find and organise shell aliases without touching .zshrc",
+		Use:   "ali",
+		Short: "Create, find and organise shell aliases without touching .zshrc",
+		Long: `ali manages your shell aliases from the command line. Aliases are saved in
+~/.config/ali/aliases.toml (plain TOML you can edit), grouped by tool, and loaded
+into every zsh session by a small block that "ali init zsh" adds to your .zshrc.
+After setup, changes made with ali take effect in the current terminal at once.
+
+Run "ali help files" to see which files ali reads and writes.`,
+		Example: `  ali init zsh                 # one-time setup
+  ali add gp 'git pull'        # create an alias (group: git)
+  ali ls                       # list everything, grouped
+  ali search pods              # find by name, command or group`,
 		Version:       version,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+	a.root = root
 	root.SetOut(out)
 	root.SetErr(errw)
 	root.SetFlagErrorFunc(func(_ *cobra.Command, err error) error { return &UsageError{err} })
 	root.CompletionOptions.DisableDefaultCmd = true
 	root.AddCommand(a.addCmd(), a.lsCmd(), a.groupsCmd(), a.searchCmd(),
-		a.updateCmd(), a.regroupCmd(), a.rmCmd(), a.initCmd(), a.importCmd())
+		a.updateCmd(), a.regroupCmd(), a.rmCmd(), a.initCmd(), a.importCmd(), a.doctorCmd(), a.subCmd(), a.varCmd(), a.envCmd(), a.configCmd(), a.expandCmd(), a.showCmd())
+	root.AddCommand(topicCmds()...)
 	return root
 }
 
@@ -132,4 +148,18 @@ func nonNil(l []alias.Alias) []alias.Alias {
 		return []alias.Alias{}
 	}
 	return l
+}
+
+// writeCompletion writes zsh completion for ali's own commands, generated from
+// the command tree, to <config>/completions/_ali.
+func (a *app) writeCompletion() error {
+	var b bytes.Buffer
+	if err := a.root.GenZshCompletion(&b); err != nil {
+		return err
+	}
+	dir := filepath.Join(a.st.Dir, "completions")
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return err
+	}
+	return store.WriteAtomic(filepath.Join(dir, "_ali"), b.Bytes(), 0o600)
 }

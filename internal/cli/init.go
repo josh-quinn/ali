@@ -14,8 +14,18 @@ func (a *app) initCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init zsh [--dry-run]",
 		Short: "One-time setup: add the ali block to your .zshrc (with backup)",
-		Args:  args(1),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		Long: `Add the ali block to your .zshrc ($ZDOTDIR/.zshrc if set). The block loads your
+aliases in every new shell and defines a small "ali" shell function so changes apply
+to the current terminal immediately. It never runs ali at shell startup.
+
+A timestamped backup is written first. Running init again does nothing if the block
+is current; if the block came from an older ali, init replaces just the block and
+leaves the rest of the file untouched. Use --dry-run to see the block without changing anything. Only zsh is
+supported.`,
+		Example: `  ali init zsh --dry-run
+  ali init zsh`,
+		Args: args(1),
+		RunE: func(_ *cobra.Command, argv []string) error {
 			if argv[0] != "zsh" {
 				return &UsageError{fmt.Errorf("unsupported shell %q (only zsh for now)", argv[0])}
 			}
@@ -31,6 +41,9 @@ func (a *app) initCmd() *cobra.Command {
 			if err := a.st.Update(func(*store.Data) error { return nil }); err != nil {
 				return err
 			}
+			if err := a.writeCompletion(); err != nil {
+				return err
+			}
 			res, err := shellconf.Install(rc)
 			if err != nil {
 				return err
@@ -39,7 +52,11 @@ func (a *app) initCmd() *cobra.Command {
 				fmt.Fprintf(a.out, "already set up (%s)\n", rc)
 				return nil
 			}
-			fmt.Fprintf(a.out, "added the ali block to %s\n", rc)
+			if res.Updated {
+				fmt.Fprintf(a.out, "updated the ali block in %s\n", rc)
+			} else {
+				fmt.Fprintf(a.out, "added the ali block to %s\n", rc)
+			}
 			if res.Backup != "" {
 				fmt.Fprintf(a.out, "backup: %s\n", res.Backup)
 			}

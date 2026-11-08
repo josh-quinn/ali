@@ -1,0 +1,40 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: standard # errcheck, govet, ineffassign, staticcheck, unused
+  enable:
+    - gosec     # security (OWASP-style checks)
+    - errorlint # correct error wrapping and comparison
+    - misspell
+    - unconvert
+    - gocritic
+    - revive
+  settings:
+    gosec:
+      excludes:
+        - G104 # unhandled errors: errcheck covers this, with the exclusions below
+    errcheck:
+      exclude-functions:
+        # Writing to the command's stdout/stderr: there is nothing useful to
+        # do if that fails, and checking every Fprint would bury the logic.
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        # Only fails for a flag name that does not exist (a programming error
+        # caught by the help/man tests).
+        - (*github.com/spf13/pflag.FlagSet).MarkHidden
+  exclusions:
+    rules:
+      # Tests write fixtures and drive subprocesses on purpose; errors there
+      # surface as test failures.
+      - path: _test\.go
+        linters: [errcheck, gosec]
+      - path: _test\.go
+        text: "unused-parameter"
+
+formatters:
+  enable:
+    - gofmt

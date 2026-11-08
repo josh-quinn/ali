@@ -6,6 +6,7 @@ import (
 	"github.com/josh-quinn/ali/internal/alias"
 	"github.com/josh-quinn/ali/internal/group"
 	"github.com/josh-quinn/ali/internal/shadow"
+	"github.com/josh-quinn/ali/internal/shelldef"
 	"github.com/josh-quinn/ali/internal/store"
 	"github.com/spf13/cobra"
 )
@@ -14,10 +15,24 @@ func (a *app) addCmd() *cobra.Command {
 	var grp string
 	var force bool
 	cmd := &cobra.Command{
-		Use:   "add <name> <command> [-g group] [--force]",
+		Use:   "add NAME COMMAND [-g GROUP] [--force]",
 		Short: "Create an alias (group defaults to the command's first word)",
-		Args:  args(2),
-		RunE: func(cmd *cobra.Command, argv []string) error {
+		Long: `Create an alias NAME that runs COMMAND. Quote COMMAND so your shell passes it as
+one argument; it is stored exactly as typed.
+
+The group is the first word of the command (skipping sudo, env, time, VAR=value and
+paths), so "helm get pods" goes to group "helm". Use -g to choose a group yourself;
+that choice sticks when you later update the command.
+
+If NAME already exists, add fails unless you pass --force. If NAME hides a command or
+builtin, or (when run from your shell) an alias or function you already have, ali
+prints a warning and still creates the alias.`,
+		Example: `  ali add gp 'git pull'
+  ali add hgp 'helm get pods' -g k8s
+  ali add gp 'git pull --rebase' --force
+  ali add hi "echo 'hello world'"        # inner quotes are kept verbatim`,
+		Args: args(2),
+		RunE: func(_ *cobra.Command, argv []string) error {
 			name, command := argv[0], argv[1]
 			if err := alias.ValidateName(name); err != nil {
 				return err
@@ -34,11 +49,20 @@ func (a *app) addCmd() *cobra.Command {
 				grp = group.Infer(command)
 			}
 			return a.st.Update(func(d *store.Data) error {
+				if err := a.checkPlaceholders(d, command); err != nil {
+					return err
+				}
 				prev, exists := d.Get(name)
 				if exists && !force {
 					return fmt.Errorf("alias %s already exists in group %s (%s); use `ali update %s <command>` or --force", name, prev.Group, display(prev.Command), name)
 				}
 				if !exists {
+					switch def := shelldef.FromEnv(); def.Kind {
+					case shelldef.Alias:
+						fmt.Fprintf(a.err, "warning: %s is already an alias in this shell (%s); ali's alias will take precedence\n", name, display(def.Text))
+					case shelldef.Function:
+						fmt.Fprintf(a.err, "warning: %s is a shell function; ali's alias will take precedence\n", name)
+					}
 					if what := shadow.Shadows(name); what != "" {
 						fmt.Fprintf(a.err, "warning: %s shadows %s\n", name, what)
 					}

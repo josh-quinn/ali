@@ -10,6 +10,10 @@ must follow on every change:
    rewrite, accepted ADRs.
 3. **Test first**, including a regression test for every bug and security fix.
 4. **Never touch the real shell config in tests.** Use a temp `HOME` / `ALI_CONFIG_DIR`.
-5. **Scope**: aliases only, zsh on macOS, minimal dependencies (see ADRs).
+5. **No secrets in history.** Run `make hooks` once per clone; never bypass the
+   pre-push scan with `--no-verify`.
+6. **Scope**: aliases, sub-aliases, placeholders and environments on zsh (macOS first),
+   minimal dependencies (see the constitution and ADRs).
 
-Workflow: spec-kit (`specs/001-alias-manager/`). Commands: `make build test vet fmt-check`.
+Workflow: spec-kit (`specs/NNN-*/`). Commands: `make build`, `make check` (everything CI
+runs), `make hooks` (once per clone).

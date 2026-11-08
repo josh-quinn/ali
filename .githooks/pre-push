@@ -1,0 +1,37 @@
+#!/bin/sh
+# pre-push: scan every commit this push would publish for secrets (tokens, keys,
+# passwords) with gitleaks, and block the push if any are found (ADR 0041).
+# Enable once per clone with: make hooks
+# It fails closed: if gitleaks is missing or a range cannot be scanned, the push
+# is blocked. Bypass deliberately with git push --no-verify.
+set -u
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-push: gitleaks is not installed, so the secret scan cannot run; push blocked." >&2
+  echo "          Install it (brew install gitleaks) or bypass deliberately with --no-verify." >&2
+  exit 1
+fi
+
+root=$(git rev-parse --show-toplevel) || exit 1
+status=0
+
+# git passes one line per ref: <local ref> <local sha> <remote ref> <remote sha>
+# (the local ref name itself is not needed)
+while read -r _ local_sha remote_ref remote_sha; do
+  case "$local_sha" in
+    *[!0]*) ;;          # a real commit
+    *) continue ;;      # all zeros: the ref is being deleted, nothing to publish
+  esac
+  case "$remote_sha" in
+    *[!0]*) range="$remote_sha..$local_sha" ;;   # update: only the new commits
+    *) range="$local_sha --not --remotes" ;;     # new ref: commits no remote has yet
+  esac
+  if ! gitleaks git --log-opts="$range" --redact --no-banner --log-level=warn -v "$root"; then
+    echo "pre-push: possible secret(s) found in commits for $remote_ref; push blocked." >&2
+    echo "          Remove them from history (not just the latest commit), or, if this is a" >&2
+    echo "          false positive, add the finding's fingerprint to .gitleaksignore." >&2
+    status=1
+  fi
+done
+
+exit $status

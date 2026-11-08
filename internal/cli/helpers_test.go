@@ -2,7 +2,9 @@ package cli
 
 import (
 	"bytes"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/josh-quinn/ali/internal/store"
@@ -24,10 +26,15 @@ func newEnv(t *testing.T) *env {
 }
 
 // run executes ali with args and returns stdout, stderr and the error.
-
 func (e *env) run(args ...string) (string, string, error) {
+	return e.runIn("", args...)
+}
+
+// runIn is run with stdin.
+func (e *env) runIn(stdin string, args ...string) (string, string, error) {
 	var out, errb bytes.Buffer
 	root := NewRoot("test", e.st, &out, &errb)
+	root.SetIn(strings.NewReader(stdin))
 	root.SetArgs(args)
 	err := root.Execute()
 	return out.String(), errb.String(), err
@@ -47,4 +54,11 @@ func seed(e *env) {
 	e.must("add", "gs", "git status")
 	e.must("add", "hgp", "helm get pods")
 	e.must("add", "k", "kubectl")
+}
+
+func writeFile(t *testing.T, path, body string) {
+	t.Helper()
+	if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+		t.Fatal(err)
+	}
 }
