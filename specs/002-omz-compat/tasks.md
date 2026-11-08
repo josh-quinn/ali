@@ -25,7 +25,7 @@ description: "Task list for Oh My Zsh compatibility"
 - [x] T007 [US1] E2E `tests/e2e/omz_test.go`: plugin-like alias and function defined before the block → warnings, aliases created
 
 ## Phase 4: US2 Restore originals on removal (P1)
-- [ ] T008 [US2] Tests then `internal/render`: `_ali_prev` record/restore logic in `aliases.zsh` (research R2, incl. `zsh/parameter` check)
+- [x] T008 [US2] Tests then `internal/render`: `_ali_prev` record/restore logic in `aliases.zsh` (research R2, incl. `zsh/parameter` check)
 - [ ] T009 [US2] E2E: add over `gp`, rm → `git push` restored in the same shell; update keeps the original remembered
 
 ## Phase 5: US4 Upgrade the block (P2)

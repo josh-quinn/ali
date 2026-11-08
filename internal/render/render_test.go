@@ -1,6 +1,7 @@
 package render
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -167,5 +168,58 @@ func TestWrapperPreservesExitStatus(t *testing.T) {
 	out := runBlock(t, "ali fail; echo \"rc=$?\"\nali add x y; echo \"rc=$?\"")
 	if !strings.Contains(out, "rc=3") || !strings.Contains(out, "rc=0") {
 		t.Errorf("exit status not preserved:\n%s", out)
+	}
+}
+
+// sourceSeq sources each rendering in order in one zsh, after setup, then runs probe.
+func sourceSeq(t *testing.T, setup string, sets [][]alias.Alias, probe string) string {
+	t.Helper()
+	zsh, err := exec.LookPath("zsh")
+	if err != nil {
+		t.Skip("zsh not installed")
+	}
+	dir := t.TempDir()
+	script := setup + "\n"
+	for i, set := range sets {
+		f := fmt.Sprintf("%s/%d.zsh", dir, i)
+		os.WriteFile(f, []byte(Zsh(set)), 0o600)
+		script += "source " + f + "\n"
+	}
+	out, _ := exec.Command(zsh, "-f", "-c", script+probe).CombinedOutput()
+	return string(out)
+}
+
+func TestRemovingAnOverrideRestoresTheOriginalAlias(t *testing.T) {
+	gp := []alias.Alias{{Name: "gp", Command: "git pull", Group: "git"}}
+	gp2 := []alias.Alias{{Name: "gp", Command: "git pull --rebase", Group: "git"}}
+	cases := []struct {
+		name string
+		sets [][]alias.Alias
+		want string
+	}{
+		{"override active", [][]alias.Alias{gp}, "gp='git pull'"},
+		{"removed", [][]alias.Alias{gp, nil}, "gp='git push'"},
+		{"updated then removed", [][]alias.Alias{gp, gp2, nil}, "gp='git push'"},
+		{"updated", [][]alias.Alias{gp, gp2}, "gp='git pull --rebase'"},
+		{"reloaded twice", [][]alias.Alias{gp, gp, nil}, "gp='git push'"},
+	}
+	for _, c := range cases {
+		out := sourceSeq(t, "alias gp='git push'", c.sets, "alias gp")
+		if strings.TrimSpace(out) != c.want {
+			t.Errorf("%s: got %q, want %q", c.name, strings.TrimSpace(out), c.want)
+		}
+	}
+	// no original: removal still unaliases
+	out := sourceSeq(t, "", [][]alias.Alias{gp, nil}, "alias gp || echo gone")
+	if !strings.Contains(out, "gone") {
+		t.Errorf("alias without original not removed: %q", out)
+	}
+}
+
+func TestRestoringPreservesTrickyOriginals(t *testing.T) {
+	gp := []alias.Alias{{Name: "gp", Command: "x", Group: "x"}}
+	out := sourceSeq(t, `alias gp='echo "it'\''s" $HOME'`, [][]alias.Alias{gp, nil}, "alias gp")
+	if want := `gp='echo "it'\''s" $HOME'`; strings.TrimSpace(out) != want {
+		t.Errorf("got %q, want %q", strings.TrimSpace(out), want)
 	}
 }
