@@ -29,7 +29,7 @@ description: "Task list for command expansion"
 
 ## Phase 4: US2 Placeholders and @ values (P1)
 - [x] T013 [US2] Tests then `internal/expand`: placeholder parsing (defined variables only), `@key`, `@var=value`, ambiguity error, unmatched `@` words left alone, same value for repeated placeholders
-- [ ] T014 [P] [US2] Tests then `internal/cli/var.go` (add/set/unset/default/rm/ls/show, references)
+- [x] T014 [P] [US2] Tests then `internal/cli/var.go` (add/set/unset/default/rm/ls/show, references)
 - [ ] T015 [US2] Tests then save-time validation in `add`/`update`/`sub`: unknown-variable placeholders literal with notice; placeholders inside quotes rejected
 - [ ] T016 [US2] Tests then `internal/render`: aliases containing placeholders rendered so they never run unexpanded (function fallback)
 - [ ] T017 [US2] E2E (zpty): `k g p n @sys`, default, `@ns=` literal, unresolved stays in editor with message, hostile value as one argument
