@@ -119,3 +119,53 @@ func TestGeneratedCodeBypassesUserAliasesOfItsOwnBuiltins(t *testing.T) {
 		}
 	}
 }
+
+// runBlock sources the .zshrc block in zsh with a fake `ali` on PATH that prints
+// the ALI_SHELL_DEF it receives, then runs script.
+func runBlock(t *testing.T, script string) string {
+	t.Helper()
+	zsh, err := exec.LookPath("zsh")
+	if err != nil {
+		t.Skip("zsh not installed")
+	}
+	dir := t.TempDir()
+	bin := dir + "/bin"
+	os.Mkdir(bin, 0o755)
+	os.WriteFile(bin+"/ali", []byte("#!/bin/sh\n[ \"$1\" = fail ] && exit 3\nprintf 'def=[%s] args=[%s]\\n' \"${ALI_SHELL_DEF-unset}\" \"$*\"\n"), 0o755)
+	cfg := dir + "/cfg"
+	os.Mkdir(cfg, 0o700)
+	os.WriteFile(cfg+"/aliases.zsh", []byte(Zsh([]alias.Alias{{Name: "mine", Command: "echo mine", Group: "echo"}})), 0o600)
+	os.WriteFile(dir+"/block.zsh", []byte(Block()), 0o600)
+	cmd := exec.Command(zsh, "-f", "-c", "source "+dir+"/block.zsh\n"+script)
+	cmd.Env = []string{"PATH=" + bin + ":/usr/bin:/bin", "ALI_CONFIG_DIR=" + cfg, "HOME=" + dir}
+	out, _ := cmd.CombinedOutput()
+	return string(out)
+}
+
+func TestWrapperReportsLiveShellDefinitionForAdd(t *testing.T) {
+	out := runBlock(t, `alias gp='git push'
+mk() { make "$@"; }
+ali add gp 'git pull'
+ali add mk make
+ali add free 'echo free'
+ali add mine 'echo again'
+ali ls gp`)
+	for _, want := range []string{
+		"def=[alias\tgit push] args=[add gp git pull]",
+		"def=[function] args=[add mk make]",
+		"def=[] args=[add free echo free]",
+		"def=[] args=[add mine echo again]", // ali's own alias is not reported
+		"def=[unset] args=[ls gp]",          // only add gets the report
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("missing %q in:\n%s", want, out)
+		}
+	}
+}
+
+func TestWrapperPreservesExitStatus(t *testing.T) {
+	out := runBlock(t, "ali fail; echo \"rc=$?\"\nali add x y; echo \"rc=$?\"")
+	if !strings.Contains(out, "rc=3") || !strings.Contains(out, "rc=0") {
+		t.Errorf("exit status not preserved:\n%s", out)
+	}
+}

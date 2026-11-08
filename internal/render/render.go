@@ -56,6 +56,21 @@ func Block() string {
 	return BlockStart + "\n# ali block v" + strconv.Itoa(BlockVersion) + ", managed by ali init zsh" + `
 _ali_dir="${ALI_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/ali}"
 [ -f "$_ali_dir/aliases.zsh" ] && \source "$_ali_dir/aliases.zsh"
-ali() { \command ali "$@"; \local rc=$?; [ -f "$_ali_dir/aliases.zsh" ] && \source "$_ali_dir/aliases.zsh"; \unset _n; \return $rc; }
+ali() {
+  # For "ali add NAME", tell the binary what NAME means in this shell (ADR 0027).
+  if [[ $1 == add && -n $2 ]]; then
+    \local _d=
+    if (( ${+aliases[$2]} && ! ${_ali_names[(Ie)$2]} )); then _d="alias"$'\t'"${aliases[$2]}"
+    elif (( ${+functions[$2]} )); then _d=function
+    fi
+    ALI_SHELL_DEF="$_d" \command ali "$@"
+  else
+    \command ali "$@"
+  fi
+  \local rc=$?
+  [ -f "$_ali_dir/aliases.zsh" ] && \source "$_ali_dir/aliases.zsh"
+  \unset _n
+  \return $rc
+}
 ` + BlockEnd + "\n"
 }
