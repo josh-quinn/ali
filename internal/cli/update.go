@@ -11,7 +11,7 @@ import (
 
 func (a *app) updateCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "update <name> <command>",
+		Use:   "update NAME COMMAND",
 		Short: "Change what an alias runs",
 		Long: `Replace the command of an existing alias. The group is re-inferred from the new
 command unless you set it explicitly with "ali add -g" or "ali regroup".`,

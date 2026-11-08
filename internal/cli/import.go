@@ -17,7 +17,7 @@ func (a *app) importCmd() *cobra.Command {
 	var file string
 	var dry bool
 	cmd := &cobra.Command{
-		Use:   "import [--file path] [--dry-run]",
+		Use:   "import [--file PATH] [--dry-run]",
 		Short: "Copy existing `alias` lines from your .zshrc into ali (originals are left alone)",
 		Long: `Read simple "alias name=value" lines from your .zshrc (or --file) and add them to
 ali, grouped automatically. Your file is never modified: ali prints the lines you

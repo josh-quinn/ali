@@ -10,7 +10,7 @@ import (
 func (a *app) lsCmd() *cobra.Command {
 	var asJSON bool
 	cmd := &cobra.Command{
-		Use:     "ls [group]",
+		Use:     "ls [GROUP]",
 		Aliases: []string{"list"},
 		Short:   "List aliases, grouped (optionally only one group)",
 		Long: `List all aliases under group headings, sorted by group and name, with commands

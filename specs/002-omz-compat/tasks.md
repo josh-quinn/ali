@@ -12,7 +12,7 @@ description: "Task list for Oh My Zsh compatibility"
 - [x] T001 Mark ADRs 0027-0029 Accepted (status line only) once the owner approves this plan
 - [x] T019 Tests then help completeness: a test walks the cobra tree and fails if any command lacks Short, Long or Example; fill in Long/Example for every existing command (add, ls, groups, search, update, regroup, rm, init, import) (FR-008)
 - [x] T020 Tests then `ali help files` topic (store, generated file, lock, backups, settings) (FR-008)
-- [ ] T021 `internal/tools/gendocs` + `make man` generating `man/*.1` (ali.1, per command, topics); GoReleaser `before` hook and archive files; Homebrew formula installs pages; test that generation succeeds and every command has a page (ADR 0038, SC-006)
+- [x] T021 `internal/tools/gendocs` + `make man` generating `man/*.1` (ali.1, per command, topics); GoReleaser `before` hook and archive files; Homebrew formula installs pages; test that generation succeeds and every command has a page (ADR 0038, SC-006)
 
 ## Phase 2: Foundational (blocks US1, US2, US4)
 - [ ] T002 Tests then `internal/shellconf`: locate block markers, `Install` replaces an outdated block in place with backup; error on unbalanced/duplicate markers; bytes outside the block unchanged (research R4)

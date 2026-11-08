@@ -3,6 +3,7 @@ project_name: ali
 before:
   hooks:
     - go mod tidy
+    - go run ./internal/tools/gendocs -out man -version {{ .Version }}
 builds:
   - main: ./cmd/ali
     binary: ali
@@ -13,6 +14,10 @@ builds:
 archives:
   - formats: [tar.gz]
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+      - man/*
 checksum:
   name_template: checksums.txt
 changelog:
@@ -24,3 +29,7 @@ brews:
     homepage: https://github.com/josh-quinn/ali
     description: Create, find and organise shell aliases without touching .zshrc
     license: MIT
+    install: |
+      bin.install "ali"
+      man1.install Dir["man/*.1"]
+      man7.install Dir["man/*.7"]

@@ -10,7 +10,7 @@ import (
 
 func (a *app) rmCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:     "rm <name>...",
+		Use:     "rm NAME...",
 		Aliases: []string{"remove", "delete"},
 		Short:   "Delete aliases",
 		Long: `Delete one or more aliases. The change applies to the current terminal at once.

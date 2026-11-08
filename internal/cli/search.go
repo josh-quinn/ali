@@ -11,7 +11,7 @@ import (
 func (a *app) searchCmd() *cobra.Command {
 	var asJSON bool
 	cmd := &cobra.Command{
-		Use:   "search <text>",
+		Use:   "search TEXT",
 		Short: "Find aliases whose name, command or group contains text",
 		Long: `Search alias names, commands and groups for TEXT, ignoring case. Results are shown
 like "ali ls". Exits with status 1 when nothing matches, so it works in scripts.`,

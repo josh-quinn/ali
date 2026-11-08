@@ -10,7 +10,7 @@ import (
 
 func (a *app) regroupCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "regroup <name> <group>",
+		Use:   "regroup NAME GROUP",
 		Short: "Move an alias to another group",
 		Long: `Move alias NAME to GROUP. Groups are lowercase letters, digits, - and _. The
 choice is kept when the command is updated later.`,

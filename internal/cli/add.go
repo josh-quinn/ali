@@ -14,7 +14,7 @@ func (a *app) addCmd() *cobra.Command {
 	var grp string
 	var force bool
 	cmd := &cobra.Command{
-		Use:   "add <name> <command> [-g group] [--force]",
+		Use:   "add NAME COMMAND [-g GROUP] [--force]",
 		Short: "Create an alias (group defaults to the command's first word)",
 		Long: `Create an alias NAME that runs COMMAND. Quote COMMAND so your shell passes it as
 one argument; it is stored exactly as typed.
