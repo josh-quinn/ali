@@ -8,6 +8,16 @@
 
 **Input**: User description: "A CLI tool that quickly creates, lists, updates and deletes shell aliases on a Mac. Aliases persist for re-use. Aliases are organized automatically by tool/group (e.g. helm), searchable, and listable by group. No more editing .zshrc by hand or hunting through an unorganized text file. Intended for public release on GitHub."
 
+## Clarifications
+
+### Session 2026-11-08
+
+- Q: What happens when `ali add` is given a name that already exists? → A: Fail with a message pointing to `ali update`; `--force` overwrites.
+- Q: Does `ali import` remove the original alias lines from the shell config? → A: No. It writes a timestamped backup, imports, and prints the original lines so the user can delete them; a later `--remove-originals` is out of scope for v1.
+- Q: When `ali update` changes the command, is the group re-inferred? → A: Only if the group was never set explicitly; an explicit group (`-g` or `regroup`) is sticky.
+- Q: How does the current shell refresh after a change? → A: A shell function installed by setup wraps `ali` and re-loads the generated aliases after any command that changed data. The hook does not run `ali` at shell startup.
+- Q: Should `ali rm` ask for confirmation? → A: No. It is non-interactive; removed aliases can be restored from the store's version history if the user keeps it in git, and `ali rm` prints what it removed.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Create an alias on the fly (Priority: P1)
