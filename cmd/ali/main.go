@@ -12,7 +12,12 @@ import (
 var version = "dev"
 
 func main() {
-	root := cli.NewRoot(version, store.New(store.DefaultDir()), os.Stdout, os.Stderr)
+	dir, err := store.DefaultDir()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "ali:", err)
+		os.Exit(1)
+	}
+	root := cli.NewRoot(version, store.New(dir), os.Stdout, os.Stderr)
 	if err := root.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, "ali:", err)
 		if cli.IsUsage(err) {

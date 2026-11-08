@@ -19,7 +19,10 @@ func (a *app) initCmd() *cobra.Command {
 			if argv[0] != "zsh" {
 				return &UsageError{fmt.Errorf("unsupported shell %q (only zsh for now)", argv[0])}
 			}
-			rc := shellconf.Path()
+			rc, err := shellconf.Path()
+			if err != nil {
+				return err
+			}
 			if dry {
 				fmt.Fprintf(a.out, "would append to %s:\n\n%s", rc, render.Block())
 				return nil

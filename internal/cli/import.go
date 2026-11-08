@@ -22,7 +22,11 @@ func (a *app) importCmd() *cobra.Command {
 		Args:  args(0),
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			if file == "" {
-				file = shellconf.Path()
+				p, err := shellconf.Path()
+				if err != nil {
+					return err
+				}
+				file = p
 			}
 			src, err := os.ReadFile(file)
 			if err != nil {

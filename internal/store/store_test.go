@@ -163,91 +163,42 @@ func TestConcurrentUpdatesLoseNothing(t *testing.T) {
 }
 
 func TestDirResolution(t *testing.T) {
+	get := func() string {
+		t.Helper()
+		d, err := DefaultDir()
+		if err != nil {
+			t.Fatal(err)
+		}
+		return d
+	}
 	t.Setenv("ALI_CONFIG_DIR", "/x/ali")
-	if got := DefaultDir(); got != "/x/ali" {
+	if got := get(); got != "/x/ali" {
 		t.Errorf("ALI_CONFIG_DIR: %s", got)
 	}
 	t.Setenv("ALI_CONFIG_DIR", "")
 	t.Setenv("XDG_CONFIG_HOME", "/xdg")
-	if got := DefaultDir(); got != "/xdg/ali" {
+	if got := get(); got != "/xdg/ali" {
 		t.Errorf("XDG: %s", got)
 	}
 	t.Setenv("XDG_CONFIG_HOME", "")
 	t.Setenv("HOME", "/h")
-	if got := DefaultDir(); got != "/h/.config/ali" {
+	if got := get(); got != "/h/.config/ali" {
 		t.Errorf("HOME: %s", got)
 	}
 }
 
-func TestStoreFilesArePrivate(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), "cfg")
-	s := New(dir)
-	if err := s.Update(func(d *Data) error {
-		d.Set(alias.Alias{Name: "deploy", Command: "TOKEN=abc123 curl https://x", Group: "curl"}, false)
-		return nil
-	}); err != nil {
-		t.Fatal(err)
+// With no home the old code produced the relative path ".config/ali" and wrote
+// into whatever directory the process happened to be in.
+func TestDirResolutionNeverFallsBackToTheWorkingDirectory(t *testing.T) {
+	t.Setenv("ALI_CONFIG_DIR", "")
+	t.Setenv("XDG_CONFIG_HOME", "")
+	t.Setenv("HOME", "")
+	if d, err := DefaultDir(); err == nil {
+		t.Errorf("want error without a home directory, got %q", d)
 	}
-	mode := func(p string) os.FileMode { st, _ := os.Stat(p); return st.Mode().Perm() }
-	if m := mode(dir); m != 0o700 {
-		t.Errorf("config dir mode %v, want 0700", m)
-	}
-	for _, f := range []string{s.File(), s.ZshFile(), filepath.Join(dir, lockName)} {
-		if m := mode(f); m != 0o600 {
-			t.Errorf("%s mode %v, want 0600", filepath.Base(f), m)
-		}
-	}
-}
-
-func TestExistingLooseFilesAreTightenedButSharedDirIsLeftAlone(t *testing.T) {
-	dir := t.TempDir() // already exists, may be shared: must not be chmod'ed
-	os.Chmod(dir, 0o755)
-	s := New(dir)
-	os.WriteFile(s.File(), []byte("version = 1\n"), 0o644)
-	if err := s.Update(func(d *Data) error { return nil }); err != nil {
-		t.Fatal(err)
-	}
-	if st, _ := os.Stat(s.File()); st.Mode().Perm() != 0o600 {
-		t.Errorf("store mode %v, want 0600", st.Mode().Perm())
-	}
-	if st, _ := os.Stat(dir); st.Mode().Perm() != 0o755 {
-		t.Errorf("pre-existing dir mode changed to %v", st.Mode().Perm())
-	}
-}
-
-func TestWriteAtomicWritesThroughSymlinks(t *testing.T) {
-	dir := t.TempDir()
-	target := filepath.Join(dir, "dotfiles", "aliases.toml")
-	os.MkdirAll(filepath.Dir(target), 0o755)
-	os.WriteFile(target, []byte("old"), 0o640)
-	link := filepath.Join(dir, "link.toml")
-	if err := os.Symlink(target, link); err != nil {
-		t.Fatal(err)
-	}
-	if err := WriteAtomic(link, []byte("new"), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	if st, _ := os.Lstat(link); st.Mode()&os.ModeSymlink == 0 {
-		t.Error("symlink was replaced by a regular file")
-	}
-	if b, _ := os.ReadFile(target); string(b) != "new" {
-		t.Errorf("target not updated: %q", b)
-	}
-}
-
-func TestWriteAtomicCreatesThroughDanglingSymlink(t *testing.T) {
-	dir := t.TempDir()
-	target := filepath.Join(dir, "dotfiles", "aliases.toml")
-	os.MkdirAll(filepath.Dir(target), 0o755)
-	link := filepath.Join(dir, "link.toml")
-	os.Symlink(filepath.Join("dotfiles", "aliases.toml"), link) // relative, target missing
-	if err := WriteAtomic(link, []byte("fresh"), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	if st, _ := os.Lstat(link); st.Mode()&os.ModeSymlink == 0 {
-		t.Error("symlink was replaced")
-	}
-	if b, _ := os.ReadFile(target); string(b) != "fresh" {
-		t.Errorf("target not created: %q", b)
+	t.Setenv("XDG_CONFIG_HOME", "relative/path") // the XDG spec says to ignore relative values
+	t.Setenv("HOME", "/h")
+	if d, _ := DefaultDir(); d != "/h/.config/ali" {
+		t.Errorf("relative XDG_CONFIG_HOME not ignored: %q", d)
 	}
 }

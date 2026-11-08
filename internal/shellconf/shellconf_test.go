@@ -62,13 +62,26 @@ func TestInstallEnsuresNewlineBeforeBlock(t *testing.T) {
 
 func TestPathHonoursZDOTDIR(t *testing.T) {
 	t.Setenv("ZDOTDIR", "/z")
-	if Path() != "/z/.zshrc" {
-		t.Errorf("got %s", Path())
+	if p, err := Path(); err != nil || p != "/z/.zshrc" {
+		t.Errorf("got %s %v", p, err)
 	}
 	t.Setenv("ZDOTDIR", "")
 	t.Setenv("HOME", "/h")
-	if Path() != "/h/.zshrc" {
-		t.Errorf("got %s", Path())
+	if p, err := Path(); err != nil || p != "/h/.zshrc" {
+		t.Errorf("got %s %v", p, err)
+	}
+}
+
+func TestPathNeverReturnsARelativePath(t *testing.T) {
+	t.Setenv("ZDOTDIR", "")
+	t.Setenv("HOME", "")
+	if p, err := Path(); err == nil {
+		t.Errorf("want error without HOME, got %q", p)
+	}
+	t.Setenv("ZDOTDIR", "relative")
+	t.Setenv("HOME", "/h")
+	if p, _ := Path(); p != "/h/.zshrc" {
+		t.Errorf("relative ZDOTDIR not ignored: %q", p)
 	}
 }
 

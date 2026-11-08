@@ -3,6 +3,7 @@
 package shellconf
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,12 +13,18 @@ import (
 	"github.com/josh-quinn/ali/internal/store"
 )
 
-// Path returns the .zshrc location, honouring ZDOTDIR.
-func Path() string {
-	if z := os.Getenv("ZDOTDIR"); z != "" {
-		return filepath.Join(z, ".zshrc")
+// Path returns the .zshrc location, honouring an absolute ZDOTDIR. It fails
+// rather than return a relative path, which would edit a .zshrc in whatever
+// directory the process is in.
+func Path() (string, error) {
+	if z := os.Getenv("ZDOTDIR"); filepath.IsAbs(z) {
+		return filepath.Join(z, ".zshrc"), nil
 	}
-	return filepath.Join(os.Getenv("HOME"), ".zshrc")
+	home, err := os.UserHomeDir()
+	if err != nil || !filepath.IsAbs(home) {
+		return "", fmt.Errorf("cannot locate .zshrc: HOME is not set")
+	}
+	return filepath.Join(home, ".zshrc"), nil
 }
 
 // Result describes what Install did.

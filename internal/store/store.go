@@ -30,14 +30,21 @@ func New(dir string) *Store { return &Store{Dir: dir} }
 
 // DefaultDir resolves the config directory: ALI_CONFIG_DIR, then
 // $XDG_CONFIG_HOME/ali, then ~/.config/ali.
-func DefaultDir() string {
+// It fails rather than guess: with no home directory a relative path would make
+// ali write into the current working directory. A relative XDG_CONFIG_HOME is
+// ignored, as the XDG specification requires.
+func DefaultDir() (string, error) {
 	if d := os.Getenv("ALI_CONFIG_DIR"); d != "" {
-		return d
+		return d, nil
 	}
-	if x := os.Getenv("XDG_CONFIG_HOME"); x != "" {
-		return filepath.Join(x, "ali")
+	if x := os.Getenv("XDG_CONFIG_HOME"); filepath.IsAbs(x) {
+		return filepath.Join(x, "ali"), nil
 	}
-	return filepath.Join(os.Getenv("HOME"), ".config", "ali")
+	home, err := os.UserHomeDir()
+	if err != nil || !filepath.IsAbs(home) {
+		return "", fmt.Errorf("cannot locate your config directory: HOME is not set (set ALI_CONFIG_DIR to choose one)")
+	}
+	return filepath.Join(home, ".config", "ali"), nil
 }
 
 // File is the path of the TOML store.
