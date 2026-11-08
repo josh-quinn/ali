@@ -27,6 +27,9 @@ command unless you set it explicitly with "ali add -g" or "ali regroup".`,
 				if !ok {
 					return fmt.Errorf("no alias %q", name)
 				}
+				if err := a.checkPlaceholders(d, command); err != nil {
+					return err
+				}
 				pinned := d.Pinned(name)
 				if !pinned {
 					cur.Group = group.Infer(command)

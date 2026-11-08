@@ -125,6 +125,9 @@ sub-alias exists, unless --force is given.`,
 				return err
 			}
 			return a.st.Update(func(d *store.Data) error {
+				if err := a.checkPlaceholders(d, exp); err != nil {
+					return err
+				}
 				if prev, ok := getSub(d, tool, name); ok && !force {
 					return fmt.Errorf("%s already exists (%s); use --force or ali sub update", subLabel(tool, name), display(prev))
 				}
@@ -166,6 +169,9 @@ func (a *app) subUpdateCmd() *cobra.Command {
 			return a.st.Update(func(d *store.Data) error {
 				if _, ok := getSub(d, tool, name); !ok {
 					return fmt.Errorf("no %s", subLabel(tool, name))
+				}
+				if err := a.checkPlaceholders(d, exp); err != nil {
+					return err
 				}
 				setSub(d, tool, name, exp)
 				fmt.Fprintf(a.out, "updated %s: %s\n", subLabel(tool, name), display(exp))

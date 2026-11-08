@@ -49,6 +49,9 @@ prints a warning and still creates the alias.`,
 				grp = group.Infer(command)
 			}
 			return a.st.Update(func(d *store.Data) error {
+				if err := a.checkPlaceholders(d, command); err != nil {
+					return err
+				}
 				prev, exists := d.Get(name)
 				if exists && !force {
 					return fmt.Errorf("alias %s already exists in group %s (%s); use `ali update %s <command>` or --force", name, prev.Group, display(prev.Command), name)
