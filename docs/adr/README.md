@@ -32,3 +32,6 @@ as the change it records.
 | [0024](0024-refuse-to-guess-locations-when-home-is-unset.md) | Refuse to guess locations when HOME is unset | Accepted |
 | [0025](0025-escape-control-characters-when-printing-stored-text-and-reject-nul.md) | Escape control characters when printing stored text and reject NUL | Accepted |
 | [0026](0026-harden-ci-and-keep-dependencies-patched.md) | Harden CI and keep dependencies patched | Accepted |
+| [0027](0027-learn-about-the-live-shell-through-the-wrapper.md) | Learn about the live shell through the wrapper | Proposed |
+| [0028](0028-remember-overridden-aliases-in-the-shell-session.md) | Remember overridden aliases in the shell session | Proposed |
+| [0029](0029-upgrade-the-managed-block-in-place.md) | Upgrade the managed block in place | Proposed |
