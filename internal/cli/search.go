@@ -13,7 +13,11 @@ func (a *app) searchCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "search <text>",
 		Short: "Find aliases whose name, command or group contains text",
-		Args:  args(1),
+		Long: `Search alias names, commands and groups for TEXT, ignoring case. Results are shown
+like "ali ls". Exits with status 1 when nothing matches, so it works in scripts.`,
+		Example: `  ali search pods
+  ali search GIT --json`,
+		Args: args(1),
 		RunE: func(cmd *cobra.Command, argv []string) error {
 			d, err := a.st.Load()
 			if err != nil {

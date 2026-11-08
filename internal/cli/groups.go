@@ -12,7 +12,11 @@ func (a *app) groupsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "groups",
 		Short: "List groups with alias counts",
-		Args:  args(0),
+		Long: `List every group with the number of aliases in it. Use --json for
+machine-readable output.`,
+		Example: `  ali groups
+  ali groups --json`,
+		Args: args(0),
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			d, err := a.st.Load()
 			if err != nil {

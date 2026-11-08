@@ -13,7 +13,12 @@ func (a *app) rmCmd() *cobra.Command {
 		Use:     "rm <name>...",
 		Aliases: []string{"remove", "delete"},
 		Short:   "Delete aliases",
-		Args:    minArgs(1),
+		Long: `Delete one or more aliases. The change applies to the current terminal at once.
+Names that do not exist are reported and make the exit status 1, but the others are
+still removed. There is no confirmation prompt.`,
+		Example: `  ali rm gp
+  ali rm gp gs hgp`,
+		Args: minArgs(1),
 		RunE: func(cmd *cobra.Command, argv []string) error {
 			var missing []string
 			err := a.st.Update(func(d *store.Data) error {

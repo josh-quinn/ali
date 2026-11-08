@@ -10,7 +10,7 @@ description: "Task list for Oh My Zsh compatibility"
 
 ## Phase 1: Setup
 - [x] T001 Mark ADRs 0027-0029 Accepted (status line only) once the owner approves this plan
-- [ ] T019 Tests then help completeness: a test walks the cobra tree and fails if any command lacks Short, Long or Example; fill in Long/Example for every existing command (add, ls, groups, search, update, regroup, rm, init, import) (FR-008)
+- [x] T019 Tests then help completeness: a test walks the cobra tree and fails if any command lacks Short, Long or Example; fill in Long/Example for every existing command (add, ls, groups, search, update, regroup, rm, init, import) (FR-008)
 - [ ] T020 Tests then `ali help files` topic (store, generated file, lock, backups, settings) (FR-008)
 - [ ] T021 `internal/tools/gendocs` + `make man` generating `man/*.1` (ali.1, per command, topics); GoReleaser `before` hook and archive files; Homebrew formula installs pages; test that generation succeeds and every command has a page (ADR 0038, SC-006)
 

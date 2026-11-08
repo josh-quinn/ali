@@ -13,7 +13,10 @@ func (a *app) updateCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "update <name> <command>",
 		Short: "Change what an alias runs",
-		Args:  args(2),
+		Long: `Replace the command of an existing alias. The group is re-inferred from the new
+command unless you set it explicitly with "ali add -g" or "ali regroup".`,
+		Example: `  ali update gp 'git pull --rebase'`,
+		Args:    args(2),
 		RunE: func(cmd *cobra.Command, argv []string) error {
 			name, command := argv[0], argv[1]
 			if err := alias.ValidateCommand(command); err != nil {
