@@ -30,7 +30,7 @@ description: "Task list for Oh My Zsh compatibility"
 
 ## Phase 5: US4 Upgrade the block (P2)
 - [x] T010 [US4] Tests then `internal/cli/init.go`: "updated" outcome and messages
-- [ ] T011 [US4] E2E: v1 block + surrounding content → upgraded, rest byte-identical, second run no-op
+- [x] T011 [US4] E2E: v1 block + surrounding content → upgraded, rest byte-identical, second run no-op
 
 ## Phase 6: US3 Doctor (P2)
 - [ ] T012 [P] [US3] Tests then `internal/doctor`: checks and result model (data-model.md)
