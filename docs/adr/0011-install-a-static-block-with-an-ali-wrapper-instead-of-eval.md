@@ -14,7 +14,7 @@ We will have `ali init zsh` append a block, delimited by `# >>> ali >>>` and `# 
 
 ## Consequences
 
-Changes are live immediately. The wrapper is zsh syntax, so supporting other shells needs their own block. Because functions are parsed when defined, aliasing builtins the wrapper uses could hijack it (addressed in ADR 0022).
+Changes are live immediately. The wrapper is zsh syntax, so supporting other shells needs their own block. Because functions are parsed when defined, aliasing builtins the wrapper uses could hijack it (addressed in ADR 0021).
 
 ## Alternatives considered
 

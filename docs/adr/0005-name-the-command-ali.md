@@ -13,7 +13,7 @@ We will call the executable `ali`.
 
 ## Consequences
 
-Two-letter-ish and memorable. The `.zshrc` wrapper function is also named `ali`, which is why the name `ali` is reserved from being aliased (see ADR 0022). Should be checked for collisions in Homebrew before the first release.
+Two-letter-ish and memorable. The `.zshrc` wrapper function is also named `ali`, which is why the name `ali` is reserved from being aliased (see ADR 0021). Should be checked for collisions in Homebrew before the first release.
 
 ## Alternatives considered
 
