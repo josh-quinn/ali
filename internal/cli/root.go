@@ -57,6 +57,7 @@ Run "ali help files" to see which files ali reads and writes.`,
 	root.CompletionOptions.DisableDefaultCmd = true
 	root.AddCommand(a.addCmd(), a.lsCmd(), a.groupsCmd(), a.searchCmd(),
 		a.updateCmd(), a.regroupCmd(), a.rmCmd(), a.initCmd(), a.importCmd())
+	root.AddCommand(topicCmds()...)
 	return root
 }
 
