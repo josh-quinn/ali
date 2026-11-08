@@ -68,12 +68,67 @@ expansion inside double quotes, `alias -g`) are reported, never guessed.
 | `ali init zsh [--dry-run]` | One-time shell setup; also upgrades the block after an ali update. |
 | `ali import [--file PATH] [--dry-run]` | Import existing aliases. |
 | `ali doctor` | Check the setup (block present and current, order with Oh My Zsh, store valid, nothing redefining ali's aliases). |
+| `ali sub add (TOOL \| --shared) NAME EXPANSION` | Short words that expand after a tool (`update`, `rm`, `ls` too). |
+| `ali var add NAME KEY=VALUE... [--default KEY]` | Named values for `{{NAME}}` placeholders (`set`, `unset`, `default`, `rm`, `ls`, `show`). |
+| `ali env add NAME VAR=VALUE... [--protect]` | Sets of values; `ali env use NAME [--global]`, `off`, `current`, `ls`, `show`. |
+| `ali show TOOL` | Everything usable with a tool: aliases, sub-aliases, variables. |
+| `ali expand 'LINE'` | Print what a line expands to, without running it. |
+| `ali config get\|set\|ls` | This machine's settings: `expand` (inline/runtime), `prompt` (right/off). |
 
 Errors go to stderr with a non-zero exit code; `--json` makes listings scriptable.
 
 Every command has `--help` with examples, `ali help files` explains what ali stores
 where, and man pages are installed with Homebrew (`man ali`, `man ali-add`, `man 7 ali-files`).
 From a source checkout, `make man` writes them to `man/`.
+
+## Sub-aliases, placeholders and environments
+
+Make whole commands short without writing shell functions.
+
+**Sub-aliases** are words that only mean something after a tool:
+
+```sh
+ali add k kubectl
+ali sub add kubectl g get
+ali sub add kubectl p pods
+ali sub add helm g 'get values'      # helm has its own g
+ali sub add --shared o '-o wide'     # works after any tool ali knows
+```
+
+Type `k g p o` and press Space or Enter: your command line becomes
+`kubectl get pods -o wide` before it runs, and history keeps the full command.
+Sub-aliases expand anywhere after the tool (`k logs mypod p`); write `\p` to keep a
+word literal, and nothing after a bare `--` expands. See `ali help expansion`.
+
+**Placeholders** take values you pick with `@`:
+
+```sh
+ali var add ns one=namespace-1 sys=kube-system --default one
+ali sub add kubectl n '-n {{ns}}'
+
+k g p n @sys          # kubectl get pods -n kube-system
+k g p n               # kubectl get pods -n namespace-1   (default)
+k g p n @ns=my-test   # literal value
+```
+
+Values are always inserted as one quoted word, never run as shell code. Tab after
+`@` lists the values. See `ali help placeholders`.
+
+**Environments** switch many values at once:
+
+```sh
+ali env add dev  ns=one
+ali env add prod ns=production --protect
+ali env use prod            # this terminal only; --global for every terminal
+k g p n @@dev               # one command in another environment
+```
+
+The prompt shows `[ali:prod]` (red when protected), and a command that takes values
+from a protected environment is shown in full and needs a second Enter. See
+`ali help environments`.
+
+Prefer the line to stay as you typed it? `ali config set expand runtime` expands
+when the command runs instead (only lines that start with an ali alias).
 
 ## Using ali with Oh My Zsh
 
@@ -122,7 +177,10 @@ both define a name.
 
 Other current limits:
 
-- **Aliases only.** An alias cannot take arguments in the middle of a command; that needs a shell function, which `ali` does not manage.
+- **No user-written shell functions.** Arguments in the middle of a command are covered by placeholders, but `ali` does not manage arbitrary shell functions.
+- **Plugin compatibility.** Expansion is tested with Oh My Zsh (its `magic-space` binding is kept). zsh-autosuggestions and zsh-syntax-highlighting have not been verified yet; `ali` wraps widgets the same way they do, so they are expected to work.
+- **Run-time mode** only expands lines that start with an ali alias, and a literal word must be written as `'\p'` (quoted).
+- Expansion needs a running `ali` (about 5 ms) only on the keystrokes that can expand; ordinary typing starts no process.
 - **zsh startup files.** The block is added to `.zshrc` (or `$ZDOTDIR/.zshrc`), so aliases exist in interactive shells only, not in scripts or non-interactive `zsh -c`.
 - **Shadow warnings** cover builtins, `PATH` commands and, when you run `ali add` from your shell, aliases and functions your shell already has (Oh My Zsh plugins included). Scripts that call the `ali` program directly only get the builtin/`PATH` check.
 - No tab completion, man page or undo yet, and no sync between machines (the store is a plain file, so a dotfiles repo works; symlinks are respected).

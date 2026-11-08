@@ -56,7 +56,7 @@ Each CLI task (T009, T010, T014, T019, T023, T026) includes Short, Long and Exam
 - [x] T033 [P] Help topics `expansion`, `placeholders`, `environments` with examples; man pages generated for them (FR-019)
 
 ## Phase 8: Polish
-- [ ] T029 [P] README: sub-aliases, placeholders, environments, settings; update Platform support/limitations
+- [x] T029 [P] README: sub-aliases, placeholders, environments, settings; update Platform support/limitations
 - [ ] T030 [P] CHANGELOG
 - [x] T031 Performance: SC-003 measurements recorded in research.md
 - [x] T032 Manual compatibility pass with zsh-autosuggestions and zsh-syntax-highlighting; record result (and any limitation) in README
