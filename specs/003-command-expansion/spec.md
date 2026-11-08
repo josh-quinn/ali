@@ -8,6 +8,24 @@
 
 **Input**: User description: "We need argument support. For example, `kubectl get pods -n namespace-1` could turn into `k g p ...`. Aliases have a parent-child relationship: g and p after k belong to k unless specified as global, so g after h is not the same as g after k; a global one can be used under any tool, and the tool's own wins on conflict. Argument lists can be global or tied to a tool, with a good way to view them. Environments: arguments with the same name whose values switch depending on the selected environment." Owner decisions after review: show expansions in the command line by default with a setting for hidden run-time expansion; use named placeholders; environments per terminal by default with a flag to set globally, always visible; use `@` for values typed at call time.
 
+## Clarifications
+
+### Session 2026-11-08
+
+Owner decisions from the design review:
+
+- Q: Should expansion be visible in the command line or happen when the command runs? → A: Visible in the command line by default; a setting switches to run-time expansion.
+- Q: Positional argument numbers (`1=1 2=1`) or named placeholders? → A: Named placeholders.
+- Q: Is the selected environment per terminal or global? → A: Per terminal by default, with a flag to set it globally; always visible.
+- Q: What marks a value typed at call time? → A: `@` (replacing the proposed `-ga`/`-gal` flags, which would collide with the tool's own flags and with `ali add -g`).
+
+Resolved during clarification (recommended options):
+
+- Q: What placeholder syntax avoids clashing with real commands? → A: `{{name}}`, recognised only when `name` is a defined variable. `<name>` is shell redirection; `{name}` collides with awk, `find -exec {}` and `${VAR}`; `{{...}}` collides only with Go templates, and only if a variable of the same name exists.
+- Q: In `@var=value`, what if `value` is also a value name? → A: The named value wins; otherwise the text is used literally.
+- Q: Do plain aliases without sub-aliases or placeholders now expand in the command line? → A: No. They keep behaving as zsh aliases (FR-017); the command line expands only when a sub-alias, placeholder or `@` word is involved.
+- Q: How do I use another environment for just one command? → A: `@@name` in the line (FR-008).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Tool-scoped sub-aliases, expanded as I type (Priority: P1)
@@ -104,7 +122,7 @@ I can see everything available for a tool in one place and get tab completion fo
 
 ### Edge Cases
 
-- A sub-alias with the same name as a real subcommand of the tool (e.g. `cp`): the sub-alias wins; `\cp` keeps it literal. `ali sub add` warns when the name matches a word in the tool's own help is out of scope; it does not warn.
+- A sub-alias with the same name as a real subcommand of the tool (e.g. `cp`): the sub-alias wins and `\cp` keeps it literal. ali does not inspect the tool's own subcommands, so it cannot warn about this.
 - Sub-alias expansions containing other sub-alias names are not expanded again (no recursion); the expansion is literal text plus placeholders.
 - Wrappers before the tool (`sudo k g p`, `time k g p`, `env X=1 k g p`) expand the same way, using the grouping rules of ADR 0008.
 - Pasted text is never expanded while pasting; it is expanded on Enter like typed text.
