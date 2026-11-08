@@ -25,8 +25,9 @@ helm
 And beyond plain aliases, short words that expand after a tool, with values you pick:
 
 ```console
-$ ali sub add kubectl g get; ali sub add kubectl p pods; ali sub add kubectl n '-n {{ns}}'
+$ ali add k kubectl
 $ ali var add ns dev=dev-ns sys=kube-system --default dev
+$ ali sub add kubectl g get; ali sub add kubectl p pods; ali sub add kubectl n '-n {{ns}}'
 $ k g p n @sys        # press Enter: the line becomes "kubectl get pods -n kube-system"
 ```
 
