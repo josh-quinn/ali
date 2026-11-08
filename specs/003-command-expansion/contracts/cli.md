@@ -25,7 +25,7 @@ Errors to stderr, exit 1 (usage 2), `--json` on every listing, as in feature 001
 | `ali env add <name> [var=value...] [--protect]` | create |
 | `ali env set <name> var=value...` / `ali env unset <name> var...` | change assignments |
 | `ali env protect <name>` / `ali env unprotect <name>` | toggle protection |
-| `ali env rm <name>` | remove (clears it if active, with notice) |
+| `ali env rm <name>` | remove; clears the global choice if it was that environment; terminals that chose it fall back to none with a warning on next expansion |
 | `ali env ls [--json]` / `ali env show [<name>]` | list (active marked); show assignments resolved to values |
 | `ali env use <name> [--global]` | per terminal (via wrapper) or global |
 | `ali env off [--global]` | clear |
@@ -36,7 +36,7 @@ Errors to stderr, exit 1 (usage 2), `--json` on every listing, as in feature 001
 |---------|-----------|
 | `ali config get <key>` / `ali config set <key> <value>` | `expand` = `inline`\|`runtime`; `prompt` = `right`\|`off`; changing `expand` regenerates `aliases.zsh` |
 | `ali expand '<line>'` | print the expanded command; exit 1 with a message if unresolved or ambiguous; never runs anything |
-| `ali expand --run <words...>` | internal (run-time functions): print ali-quoted command for `eval` |
+| `ali expand --run <words...>` | internal (run-time functions): print ali-quoted command for `eval`; for a protected environment, confirm on `/dev/tty`, or exit 1 if there is no terminal |
 | `ali expand --zle --cursor N -- <buffer>` | internal (widgets): NUL-separated `status, cursor, buffer, message` (research R4) |
 | `ali show <tool> [--json]` | aliases, sub-aliases, applicable shared sub-aliases, referenced variables |
 

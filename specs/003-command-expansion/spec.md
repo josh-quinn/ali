@@ -130,8 +130,8 @@ I can see everything available for a tool in one place and get tab completion fo
 - Placeholders inside quotes in a definition (`echo '{{ns}}'`) are rejected when the alias is saved, because a value cannot be safely inserted there.
 - A line using a placeholder but no `@` and no environment/default: not run; the message lists the missing variables. In visible mode the line stays in the editor so I can fix it.
 - Multiple uses of the same placeholder in one line resolve to the same value.
-- Renaming or removing a variable that is still referenced is refused, with the list of referencing aliases.
-- Removing the active environment clears it everywhere with a notice.
+- Removing a variable that is still referenced is refused, with the list of referencing aliases. There is no rename command; remove and re-add.
+- Removing an environment that is active: the global choice is cleared at once; other terminals that chose it keep showing its name until they next run `ali` or start a new shell, and any expansion there treats it as no environment and warns.
 - Expansion in non-interactive shells and scripts: none (as with aliases).
 - The store from feature 001 (no subs/variables) keeps working unchanged; older ali versions refuse a store that uses the new sections instead of corrupting it.
 - Other zsh plugins that bind Space or Enter (e.g. zsh-autosuggestions, zsh-syntax-highlighting, Oh My Zsh): both must keep working.
@@ -153,7 +153,7 @@ I can see everything available for a tool in one place and get tab completion fo
 - **FR-011**: Users MUST be able to define, list, inspect, update and remove environments that assign values (named or literal) to variables, and mark an environment as protected.
 - **FR-012**: `ali env use <name>` MUST change the environment for the current terminal only; `--global` MUST change it for all terminals that have no per-terminal choice, including the current one; `ali env off` MUST clear it.
 - **FR-013**: The active environment MUST be shown in the prompt by default, distinctly when protected; users MUST be able to turn the indicator off or place it in their own theme.
-- **FR-014**: Lines that resolve values from a protected environment MUST require a second confirmation (second Enter in visible mode, a prompt in run-time mode) after showing the resolved command.
+- **FR-014**: Lines that resolve values from a protected environment MUST require a second confirmation (second Enter in visible mode, a prompt in run-time mode) after showing the resolved command; without a terminal they MUST be refused.
 - **FR-015**: `ali expand '<line>'` MUST print what a line would become, without running it.
 - **FR-016**: `ali show <tool>` MUST list the tool's aliases, sub-aliases, applicable shared sub-aliases and referenced variables; tab completion MUST offer sub-aliases after a tool and `@` values when placeholders are present.
 - **FR-017**: Lines that use no ali alias, sub-alias or placeholder MUST behave exactly as before.
