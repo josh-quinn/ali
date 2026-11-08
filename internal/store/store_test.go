@@ -202,3 +202,76 @@ func TestDirResolutionNeverFallsBackToTheWorkingDirectory(t *testing.T) {
 		t.Errorf("relative XDG_CONFIG_HOME not ignored: %q", d)
 	}
 }
+
+func TestStoreFilesArePrivate(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "cfg")
+	s := New(dir)
+	if err := s.Update(func(d *Data) error {
+		d.Set(alias.Alias{Name: "deploy", Command: "TOKEN=abc123 curl https://x", Group: "curl"}, false)
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	mode := func(p string) os.FileMode { st, _ := os.Stat(p); return st.Mode().Perm() }
+	if m := mode(dir); m != 0o700 {
+		t.Errorf("config dir mode %v, want 0700", m)
+	}
+	for _, f := range []string{s.File(), s.ZshFile(), filepath.Join(dir, lockName)} {
+		if m := mode(f); m != 0o600 {
+			t.Errorf("%s mode %v, want 0600", filepath.Base(f), m)
+		}
+	}
+}
+
+func TestExistingLooseFilesAreTightenedButSharedDirIsLeftAlone(t *testing.T) {
+	dir := t.TempDir() // already exists, may be shared: must not be chmod'ed
+	os.Chmod(dir, 0o755)
+	s := New(dir)
+	os.WriteFile(s.File(), []byte("version = 1\n"), 0o644)
+	if err := s.Update(func(d *Data) error { return nil }); err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := os.Stat(s.File()); st.Mode().Perm() != 0o600 {
+		t.Errorf("store mode %v, want 0600", st.Mode().Perm())
+	}
+	if st, _ := os.Stat(dir); st.Mode().Perm() != 0o755 {
+		t.Errorf("pre-existing dir mode changed to %v", st.Mode().Perm())
+	}
+}
+
+func TestWriteAtomicWritesThroughSymlinks(t *testing.T) {
+	dir := t.TempDir()
+	target := filepath.Join(dir, "dotfiles", "aliases.toml")
+	os.MkdirAll(filepath.Dir(target), 0o755)
+	os.WriteFile(target, []byte("old"), 0o640)
+	link := filepath.Join(dir, "link.toml")
+	if err := os.Symlink(target, link); err != nil {
+		t.Fatal(err)
+	}
+	if err := WriteAtomic(link, []byte("new"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := os.Lstat(link); st.Mode()&os.ModeSymlink == 0 {
+		t.Error("symlink was replaced by a regular file")
+	}
+	if b, _ := os.ReadFile(target); string(b) != "new" {
+		t.Errorf("target not updated: %q", b)
+	}
+}
+
+func TestWriteAtomicCreatesThroughDanglingSymlink(t *testing.T) {
+	dir := t.TempDir()
+	target := filepath.Join(dir, "dotfiles", "aliases.toml")
+	os.MkdirAll(filepath.Dir(target), 0o755)
+	link := filepath.Join(dir, "link.toml")
+	os.Symlink(filepath.Join("dotfiles", "aliases.toml"), link) // relative, target missing
+	if err := WriteAtomic(link, []byte("fresh"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := os.Lstat(link); st.Mode()&os.ModeSymlink == 0 {
+		t.Error("symlink was replaced")
+	}
+	if b, _ := os.ReadFile(target); string(b) != "fresh" {
+		t.Errorf("target not created: %q", b)
+	}
+}
