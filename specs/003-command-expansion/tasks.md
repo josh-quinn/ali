@@ -24,7 +24,7 @@ description: "Task list for command expansion"
 - [x] T008 [US1] Tests then `internal/expand`: tool detection through aliases and wrappers; sub-alias expansion anywhere after the tool (`k get p`, `k logs x p`); tool-over-shared; `\word`; bare `--` ends expansion; per-command scoping across `;`/`|`/`&&`; no recursion
 - [x] T009 [P] [US1] Tests then `internal/cli/sub.go` (add/update/rm/ls, `--shared`, `--json`)
 - [x] T010 [US1] Tests then `internal/cli/expand.go` (`ali expand '<line>'` and `--zle` protocol, research R4)
-- [ ] T011 [US1] Tests then `internal/render`: `_ali_trigger` and sub-name gate tables; Space and Enter widgets chaining to previous widgets; paste skipped (research R2, R3)
+- [x] T011 [US1] Tests then `internal/render`: `_ali_trigger` and sub-name gate tables; Space and Enter widgets chaining to previous widgets; paste skipped (research R2, R3)
 - [ ] T012 [US1] E2E (zpty): `k g p ` shows `kubectl get pods `; `k get p ` expands `p`; `k logs \p` stays literal; Enter without space expands; history text; `kubectl g p`; plain `ls` spawns no process
 
 ## Phase 4: US2 Placeholders and @ values (P1)

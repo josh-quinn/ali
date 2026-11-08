@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/josh-quinn/ali/internal/model"
+	"github.com/josh-quinn/ali/internal/render"
 )
 
 // Feature 003 tables (data-model.md). They are written only when used, and
@@ -92,6 +93,15 @@ func (d *Data) DeleteEnv(name string) bool {
 	_, ok := d.x.envs[name]
 	delete(d.x.envs, name)
 	return ok
+}
+
+// RenderInput collects what aliases.zsh is generated from.
+func (d *Data) RenderInput() render.Input {
+	subs := map[string]map[string]string{}
+	for tool := range d.x.subs {
+		subs[tool] = d.Subs(tool)
+	}
+	return render.Input{Aliases: d.All(), Subs: subs, Shared: d.Shared(), Vars: d.VarNames()}
 }
 
 // UsesOf lists what references variable name: "alias X", "sub TOOL X",
