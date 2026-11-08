@@ -58,17 +58,38 @@ expansion inside double quotes, `alias -g`) are reported, never guessed.
 
 | Command | What it does |
 |---|---|
-| `ali add <name> <command> [-g group] [--force]` | Create an alias. Group defaults to the command's first word (`sudo`, `env`, `VAR=x` and paths are skipped). |
-| `ali ls [group] [--json]` | List aliases grouped and aligned, or just one group. |
+| `ali add NAME COMMAND [-g GROUP] [--force]` | Create an alias. Group defaults to the command's first word (`sudo`, `env`, `VAR=x` and paths are skipped). |
+| `ali ls [GROUP] [--json]` | List aliases grouped and aligned, or just one group. |
 | `ali groups [--json]` | List groups with counts. |
-| `ali search <text> [--json]` | Case-insensitive match on name, command or group. |
-| `ali update <name> <command>` | Change what an alias runs. |
-| `ali regroup <name> <group>` | Move an alias to another group (sticks across updates). |
-| `ali rm <name>...` | Delete aliases. |
-| `ali init zsh [--dry-run]` | One-time shell setup. |
-| `ali import [--file path] [--dry-run]` | Import existing aliases. |
+| `ali search TEXT [--json]` | Case-insensitive match on name, command or group. |
+| `ali update NAME COMMAND` | Change what an alias runs. |
+| `ali regroup NAME GROUP` | Move an alias to another group (sticks across updates). |
+| `ali rm NAME...` | Delete aliases. |
+| `ali init zsh [--dry-run]` | One-time shell setup; also upgrades the block after an ali update. |
+| `ali import [--file PATH] [--dry-run]` | Import existing aliases. |
+| `ali doctor` | Check the setup (block present and current, order with Oh My Zsh, store valid, nothing redefining ali's aliases). |
 
 Errors go to stderr with a non-zero exit code; `--json` makes listings scriptable.
+
+Every command has `--help` with examples, `ali help files` explains what ali stores
+where, and man pages are installed with Homebrew (`man ali`, `man ali-add`, `man 7 ali-files`).
+From a source checkout, `make man` writes them to `man/`.
+
+## Using ali with Oh My Zsh
+
+ali works alongside Oh My Zsh. `ali init zsh` appends its block after
+`source $ZSH/oh-my-zsh.sh`, so Oh My Zsh loads first and ali's aliases win where
+both define a name.
+
+- **You are told when you override something.** Oh My Zsh's git plugin defines
+  `gp='git push'`. `ali add gp 'git pull'` prints
+  `warning: gp is already an alias in this shell (git push); ali's alias will take precedence`
+  and still creates it. (The `ali` shell function passes your shell's definition to
+  ali, because the ali program itself cannot see your shell's aliases.)
+- **Removing your version brings theirs back**, immediately: after `ali rm gp`,
+  `gp` is `git push` again in the same terminal.
+- **`ali doctor`** tells you if the block ended up above `oh-my-zsh.sh`, if something
+  later in `.zshrc` redefines one of ali's aliases, or if the block is out of date.
 
 ## How it works
 
@@ -103,9 +124,9 @@ Other current limits:
 
 - **Aliases only.** An alias cannot take arguments in the middle of a command; that needs a shell function, which `ali` does not manage.
 - **zsh startup files.** The block is added to `.zshrc` (or `$ZDOTDIR/.zshrc`), so aliases exist in interactive shells only, not in scripts or non-interactive `zsh -c`.
-- **Shadow warnings** cover builtins and `PATH` commands. They do not know about aliases or functions defined elsewhere in your rc files (for example Oh My Zsh plugins). Because the `ali` block is appended last, its aliases win.
+- **Shadow warnings** cover builtins, `PATH` commands and, when you run `ali add` from your shell, aliases and functions your shell already has (Oh My Zsh plugins included). Scripts that call the `ali` program directly only get the builtin/`PATH` check.
 - No tab completion, man page or undo yet, and no sync between machines (the store is a plain file, so a dotfiles repo works; symlinks are respected).
-- Reserved names: `ali`, `alias`, `unalias`, `builtin`, `command`, `source`, `local`, `return`, `unset`, `for`, `do`, `done` cannot be used as alias names.
+- Reserved names: `ali`, `alias`, `unalias`, `builtin`, `command`, `source`, `local`, `return`, `unset`, `for`, `do`, `done`, `if`, `then`, `elif`, `else`, `fi` cannot be used as alias names (ali's shell code relies on them).
 
 ## Notes
 

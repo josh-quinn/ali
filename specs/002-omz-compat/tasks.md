@@ -39,7 +39,7 @@ description: "Task list for Oh My Zsh compatibility"
 - [x] T015 [US3] E2E: each misconfiguration flagged; healthy setup passes; outside-wrapper run lists skipped checks
 
 ## Phase 7: Polish
-- [ ] T016 [P] README: "Using ali with Oh My Zsh" section; update Platform support/limitations text about shadow warnings; document `ali help` and `man ali`
+- [x] T016 [P] README: "Using ali with Oh My Zsh" section; update Platform support/limitations text about shadow warnings; document `ali help` and `man ali`
 - [ ] T017 [P] CHANGELOG entry
 - [ ] T018 Run quickstart.md; verify SC-001..SC-005 (startup delta < 1 ms)
 
