@@ -1,0 +1,5 @@
+/ali
+/dist/
+*.test
+.DS_Store
+.specify/extensions/.cache/
