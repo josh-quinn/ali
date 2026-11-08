@@ -74,12 +74,12 @@ func (a *app) importCmd() *cobra.Command {
 			}
 			fmt.Fprintf(a.out, "%s %d, skipped %d\n", verb, len(imported), len(skipped))
 			for _, s := range skipped {
-				fmt.Fprintf(a.out, "  skipped line %d (%s): %s\n", s.LineNo, s.Reason, s.Line)
+				fmt.Fprintf(a.out, "  skipped line %d (%s): %s\n", s.LineNo, s.Reason, display(s.Line))
 			}
 			if len(imported) > 0 {
 				fmt.Fprintf(a.out, "\nthe originals are still in %s; delete these lines to avoid duplicates:\n", file)
 				for _, e := range imported {
-					fmt.Fprintf(a.out, "  line %d: %s\n", e.LineNo, e.Line)
+					fmt.Fprintf(a.out, "  line %d: %s\n", e.LineNo, display(e.Line))
 				}
 			}
 			return nil

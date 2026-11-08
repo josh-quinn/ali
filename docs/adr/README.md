@@ -30,3 +30,4 @@ as the change it records.
 | [0022](0022-keep-the-config-directory-and-its-files-private.md) | Keep the config directory and its files private | Accepted |
 | [0023](0023-write-through-symlinks-instead-of-replacing-them.md) | Write through symlinks instead of replacing them | Accepted |
 | [0024](0024-refuse-to-guess-locations-when-home-is-unset.md) | Refuse to guess locations when HOME is unset | Accepted |
+| [0025](0025-escape-control-characters-when-printing-stored-text-and-reject-nul.md) | Escape control characters when printing stored text and reject NUL | Accepted |

@@ -55,10 +55,14 @@ func ValidateGroup(group string) error {
 	return nil
 }
 
-// ValidateCommand rejects empty commands. Any other content is stored verbatim.
+// ValidateCommand rejects empty commands and NUL bytes. Any other content is
+// stored verbatim.
 func ValidateCommand(cmd string) error {
 	if strings.TrimSpace(cmd) == "" {
 		return fmt.Errorf("command must not be empty")
+	}
+	if strings.ContainsRune(cmd, 0) {
+		return fmt.Errorf("command must not contain a NUL byte")
 	}
 	return nil
 }

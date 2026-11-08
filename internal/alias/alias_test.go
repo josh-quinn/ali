@@ -53,3 +53,9 @@ func TestValidateNameRejectsWordsTheShellBlockRelaysOn(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateCommandRejectsNUL(t *testing.T) {
+	if err := ValidateCommand("echo a\x00b"); err == nil {
+		t.Error("NUL byte accepted: zsh cannot hold it and it truncates the alias")
+	}
+}

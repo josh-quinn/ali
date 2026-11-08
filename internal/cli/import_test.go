@@ -44,3 +44,13 @@ func TestImport(t *testing.T) {
 		t.Errorf("want 1 backup, got %v", matches)
 	}
 }
+
+func TestImportReportSanitisesSkippedLines(t *testing.T) {
+	e := newEnv(t)
+	rc := filepath.Join(e.dir, ".zshrc")
+	os.WriteFile(rc, []byte("alias bad=\"echo $HOME \x1b[31m\"\n"), 0o644)
+	out := e.must("import", "--dry-run")
+	if strings.ContainsRune(out, '\x1b') {
+		t.Errorf("import report leaked an escape: %q", out)
+	}
+}

@@ -43,3 +43,26 @@ func TestLsEmptyAndJSON(t *testing.T) {
 		t.Errorf("json fields: %v", got[0])
 	}
 }
+
+// A stored command (or a hand-edited store) must not be able to drive the
+// terminal: escape sequences could clear the screen or hide text.
+func TestListingNeutralisesTerminalControlSequences(t *testing.T) {
+	e := newEnv(t)
+	e.must("add", "evil", "echo \x1b[2J\x1b]0;pwned\a\x1b[8mhidden\r\u009b31m")
+	for _, args := range [][]string{{"ls"}, {"search", "evil"}, {"add", "evil2", "echo \x1b[2J"}, {"update", "evil", "echo \x1b[31m"}} {
+		out := e.must(args...)
+		for _, r := range out {
+			if r == '\x1b' || r == '\a' || r == '\r' || (r >= 0x80 && r <= 0x9f) {
+				t.Fatalf("ali %v leaked control character %q in %q", args, r, out)
+			}
+		}
+	}
+	if out := e.must("ls"); !strings.Contains(out, `\x1b[2J`) {
+		t.Errorf("escape should be shown visibly:\n%s", out)
+	}
+	// the stored value itself must stay verbatim
+	d, _ := e.st.Load()
+	if a, _ := d.Get("evil2"); a.Command != "echo \x1b[2J" {
+		t.Errorf("stored command was altered: %q", a.Command)
+	}
+}

@@ -105,7 +105,27 @@ func (a *app) printGrouped(list []alias.Alias) {
 	}
 }
 
-func display(cmd string) string { return strings.ReplaceAll(cmd, "\n", `\n`) }
+// display makes untrusted text safe to print: control characters (including
+// ESC and the C1 range, which terminals treat as escape sequences) are shown as
+// visible escapes instead of being interpreted.
+func display(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		switch {
+		case r == '\n':
+			b.WriteString(`\n`)
+		case r == '\t':
+			b.WriteString(`\t`)
+		case r == '\r':
+			b.WriteString(`\r`)
+		case r < 0x20 || r == 0x7f || (r >= 0x80 && r <= 0x9f):
+			fmt.Fprintf(&b, `\x%02x`, r)
+		default:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
 
 func nonNil(l []alias.Alias) []alias.Alias {
 	if l == nil {
