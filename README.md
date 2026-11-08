@@ -57,9 +57,17 @@ Pick one:
 
 | Method | Command | Notes |
 |---|---|---|
-| Homebrew | `brew install --cask josh-quinn/tap/ali` | Available once the first version is tagged (not yet). Installs the man pages too. |
+| Homebrew | `brew install --cask josh-quinn/tap/ali` | Installs the man pages too. |
+| Release download | [GitHub Releases](https://github.com/josh-quinn/ali/releases) | Archives for macOS and Linux (arm64, amd64) with `checksums.txt`. |
 | Go | `go install github.com/josh-quinn/ali/cmd/ali@latest` | Puts `ali` in `$(go env GOPATH)/bin`, usually `~/go/bin`. |
 | From source | `git clone https://github.com/josh-quinn/ali && cd ali && make build` | Produces `./ali`; copy it somewhere on your `PATH`, e.g. `cp ali ~/.local/bin/`. `make man` builds the man pages into `man/`. |
+
+Release archives carry build-provenance attestations, so you can check that a
+download was built by this repository's release workflow:
+
+```sh
+gh attestation verify ali_<version>_darwin_arm64.tar.gz --repo josh-quinn/ali
+```
 
 Then make sure your shell can find it:
 

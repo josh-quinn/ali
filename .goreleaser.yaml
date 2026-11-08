@@ -25,12 +25,39 @@ release:
 checksum:
   name_template: checksums.txt
 changelog:
+  use: git
   sort: asc
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\(.+\))??!?:.+$'
+      order: 1
+    - title: Performance
+      regexp: '^.*?perf(\(.+\))??!?:.+$'
+      order: 2
+    - title: Documentation
+      regexp: '^.*?docs(\(.+\))??!?:.+$'
+      order: 3
+    - title: Build, CI and tests
+      regexp: '^.*?(build|ci|test|refactor|chore)(\(.+\))??!?:.+$'
+      order: 4
+    - title: Other
+      order: 999
+  filters:
+    exclude:
+      - "^Merge "
 homebrew_casks:
   - name: ali
     repository:
       owner: josh-quinn
       name: homebrew-tap
+      # A fine-grained token with write access to the tap repository only: the
+      # release workflow's own GITHUB_TOKEN cannot push to another repository.
+      token: '{{ envOrDefault "HOMEBREW_TAP_TOKEN" "" }}'
+    # Without that token, publish the release but skip the cask instead of failing.
+    skip_upload: '{{ if eq (envOrDefault "HOMEBREW_TAP_TOKEN" "") "" }}true{{ else }}false{{ end }}'
     homepage: https://github.com/josh-quinn/ali
     description: Create, find and organise shell aliases without touching .zshrc
     license: MIT
