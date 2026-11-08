@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -53,4 +54,11 @@ func seed(e *env) {
 	e.must("add", "gs", "git status")
 	e.must("add", "hgp", "helm get pods")
 	e.must("add", "k", "kubectl")
+}
+
+func writeFile(t *testing.T, path, body string) {
+	t.Helper()
+	if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+		t.Fatal(err)
+	}
 }
