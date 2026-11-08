@@ -89,11 +89,30 @@ Errors go to stderr with a non-zero exit code; `--json` makes listings scriptabl
   its location rather than overwritten.
 - The only commands that touch `.zshrc` are `init` and `import`, and both back it up first.
 
+## Platform support
+
+| Platform | Status |
+|---|---|
+| macOS + zsh (Apple Silicon and Intel) | **Supported.** The only tested combination; CI runs on macOS. |
+| Linux + zsh | **Untested.** The code compiles and vets clean for Linux, but CI does not run there yet. It should work; please report issues. |
+| bash | **Not supported.** `ali init bash` is rejected. The generated file does load in bash, but removals do not take effect for more than the first stale alias (zsh and bash expand array variables differently), and the `.zshrc` block is zsh-only. |
+| fish, nushell, PowerShell | **Not supported.** Different alias syntax and rc files. |
+| Windows | **Does not build** (file locking uses Unix `flock`). |
+
+Other current limits:
+
+- **Aliases only.** An alias cannot take arguments in the middle of a command; that needs a shell function, which `ali` does not manage.
+- **zsh startup files.** The block is added to `.zshrc` (or `$ZDOTDIR/.zshrc`), so aliases exist in interactive shells only, not in scripts or non-interactive `zsh -c`.
+- **Shadow warnings** cover builtins and `PATH` commands. They do not know about aliases or functions defined elsewhere in your rc files (for example Oh My Zsh plugins). Because the `ali` block is appended last, its aliases win.
+- No tab completion, man page or undo yet, and no sync between machines (the store is a plain file, so a dotfiles repo works; symlinks are respected).
+- Reserved names: `ali`, `alias`, `unalias`, `builtin`, `command`, `source`, `local`, `return`, `unset`, `for`, `do`, `done` cannot be used as alias names.
+
 ## Notes
 
 - A warning is printed if a new alias shadows an existing command (`ali add ls ...`), but it is still created.
 - Environment: `ALI_CONFIG_DIR` overrides the config directory; `ZDOTDIR` is honoured for `.zshrc`.
-- Scope for now: aliases only, zsh only. Functions, other shells and Linux are not goals of v1.
+- Your stored commands may contain secrets, so the config directory is created `0700` and its files `0600`.
+- Scope for now: aliases only, zsh only. Functions and other shells are not goals of v1.
 
 ## Development
 
@@ -104,6 +123,7 @@ make test vet fmt-check
 This project was built with [Spec Kit](https://github.com/github/spec-kit); the spec, plan
 and task list are in [`specs/001-alias-manager/`](specs/001-alias-manager) and the project
 principles in [`.specify/memory/constitution.md`](.specify/memory/constitution.md).
+Design decisions are recorded as ADRs in [`docs/adr/`](docs/adr).
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
