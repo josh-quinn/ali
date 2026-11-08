@@ -40,7 +40,9 @@ be justified in the plan's complexity tracking.
 Output for humans goes to stdout, diagnostics and errors to stderr, with non-zero exit
 codes on failure. Listing commands MUST offer a stable machine-readable form (`--json`).
 Destructive or overwriting actions require an explicit flag (`--force`) rather than a
-prompt, so the tool stays non-interactive and scriptable.
+prompt, so the tool stays non-interactive and scriptable. The single exception is a
+command resolved from an environment the user marked as protected: it MUST be confirmed
+interactively, and when no terminal is available it MUST be refused, never run.
 
 ### VII. Show What Will Run
 Expansions MUST be visible by default: the expanded command appears in the command line
@@ -99,4 +101,4 @@ MINOR for adding a principle or materially expanding guidance, PATCH for wording
 Every plan and review MUST verify compliance; added complexity MUST be justified in the
 plan's complexity tracking table.
 
-**Version**: 2.0.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
+**Version**: 2.1.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
