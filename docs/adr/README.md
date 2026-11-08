@@ -18,3 +18,9 @@ as the change it records.
 | [0010](0010-generate-aliases-zsh-and-source-it-from-zshrc.md) | Generate aliases.zsh and source it from .zshrc | Accepted |
 | [0011](0011-install-a-static-block-with-an-ali-wrapper-instead-of-eval.md) | Install a static block with an ali() wrapper instead of eval | Accepted |
 | [0012](0012-track-loaded-alias-names-so-removals-take-effect.md) | Track loaded alias names so removals take effect | Accepted |
+| [0013](0013-quote-alias-commands-with-single-quotes.md) | Quote alias commands with single quotes | Accepted |
+| [0014](0014-write-atomically-under-an-advisory-lock.md) | Write atomically under an advisory lock | Accepted |
+| [0015](0015-never-prompt-fail-on-collisions-unless-force.md) | Never prompt; fail on collisions unless --force | Accepted |
+| [0016](0016-warn-but-do-not-block-when-an-alias-shadows-a-command.md) | Warn but do not block when an alias shadows a command | Accepted |
+| [0017](0017-make-import-conservative-and-non-destructive.md) | Make import conservative and non-destructive | Accepted |
+| [0018](0018-back-up-user-files-before-changing-them.md) | Back up user files before changing them | Accepted |
