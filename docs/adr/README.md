@@ -31,3 +31,4 @@ as the change it records.
 | [0023](0023-write-through-symlinks-instead-of-replacing-them.md) | Write through symlinks instead of replacing them | Accepted |
 | [0024](0024-refuse-to-guess-locations-when-home-is-unset.md) | Refuse to guess locations when HOME is unset | Accepted |
 | [0025](0025-escape-control-characters-when-printing-stored-text-and-reject-nul.md) | Escape control characters when printing stored text and reject NUL | Accepted |
+| [0026](0026-harden-ci-and-keep-dependencies-patched.md) | Harden CI and keep dependencies patched | Accepted |
