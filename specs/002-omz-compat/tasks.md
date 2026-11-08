@@ -41,7 +41,10 @@ description: "Task list for Oh My Zsh compatibility"
 ## Phase 7: Polish
 - [x] T016 [P] README: "Using ali with Oh My Zsh" section; update Platform support/limitations text about shadow warnings; document `ali help` and `man ali`
 - [x] T017 [P] CHANGELOG entry
-- [ ] T018 Run quickstart.md; verify SC-001..SC-005 (startup delta < 1 ms)
+- [x] T018 Run quickstart.md; verify SC-001..SC-005 (startup delta < 1 ms)
+  - Quickstart steps 1-5 are automated: `tests/e2e/omz_test.go`, `doctor_test.go`, `upgrade_test.go`.
+  - SC-001 (warnings), SC-002 (restore), SC-003 (doctor flags each problem, no false alarms), SC-004 (byte-identical upgrade), SC-006 (help/man test): met.
+  - SC-005: +0.59 ms at 100 aliases (met); +1.09 ms at 1,000 aliases (missed by ~0.1 ms; see research R1b).
 
 ## Dependencies
 Phase 1 docs tasks (T019-T021) come first so every later command is written to the help standard. Phase 2 → US1 → US2; US4 and US3 depend only on Phase 2 (US3's live check also needs T005's wrapper pattern). MVP = Phases 2-3.
