@@ -28,6 +28,7 @@ var reservedNames = map[string]bool{
 	"ali": true, "alias": true, "unalias": true, "builtin": true, "command": true,
 	"source": true, "local": true, "return": true, "unset": true,
 	"for": true, "do": true, "done": true,
+	"if": true, "then": true, "elif": true, "else": true, "fi": true,
 }
 
 // ValidateName reports why name is not a usable alias name.

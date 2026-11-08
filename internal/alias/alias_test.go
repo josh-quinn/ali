@@ -46,7 +46,7 @@ func TestValidateCommand(t *testing.T) {
 }
 
 func TestValidateNameRejectsWordsTheShellBlockRelaysOn(t *testing.T) {
-	for _, n := range []string{"ali", "alias", "unalias", "builtin", "command", "source", "local", "return", "for", "do", "done", "unset"} {
+	for _, n := range []string{"ali", "alias", "unalias", "builtin", "command", "source", "local", "return", "for", "do", "done", "unset", "if", "then", "elif", "else", "fi"} {
 		err := ValidateName(n)
 		if err == nil || !strings.Contains(err.Error(), "reserved") {
 			t.Errorf("ValidateName(%q) = %v, want reserved error", n, err)
