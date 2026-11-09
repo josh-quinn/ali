@@ -378,6 +378,10 @@ plans and task lists are in [`specs/`](specs) and the project principles in
 Design decisions are recorded as ADRs in [`docs/adr/`](docs/adr).
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Security
+
+Please report vulnerabilities privately; see [SECURITY.md](SECURITY.md).
+
 ## License
 
 MIT

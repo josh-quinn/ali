@@ -1,5 +1,7 @@
 # Contributing
 
+Security problems: please report them privately as described in [SECURITY.md](SECURITY.md), not in a public issue.
+
 Thanks for helping. A few ground rules, taken from the project [constitution](.specify/memory/constitution.md):
 
 - **Test first.** Add a failing test, then the code. Shell quoting, grouping, atomic writes
