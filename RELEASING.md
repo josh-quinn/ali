@@ -47,6 +47,9 @@ have recorded it). Mark the broken release's notes as superseded.
 
 Changing `.goreleaser.yaml`? `goreleaser check` and snapshot builds do not evaluate
 templates that only run when publishing (such as the Homebrew cask's `token` and
-`skip_upload`). That is how v0.1.0 shipped without its cask. To test such a
-template, put the same expression in a temporary `before.hooks` entry, e.g.
-`echo "{{ index .Env "HOMEBREW_TAP_TOKEN" }}"`, and run a snapshot.
+`skip_upload`). That is how v0.1.0 shipped without its cask. Two rules bit
+v0.1.0 and v0.1.1: only GoReleaser's own template functions exist (no `envOrDefault`),
+and `token` fields must be exactly `{{ .Env.NAME }}`. `tests/release` checks both; to
+test any other such template, put the same expression in a temporary
+`before.hooks` entry, e.g. `echo "{{ index .Env "HOMEBREW_TAP_TOKEN" }}"`, and run a
+snapshot.
