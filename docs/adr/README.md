@@ -49,3 +49,4 @@ as the change it records.
 | [0041](0041-scan-for-secrets-before-every-push-and-again-in-ci.md) | Scan for secrets before every push and again in CI | Accepted |
 | [0042](0042-release-from-version-tags-with-goreleaser-and-build-provenance.md) | Release from version tags with GoReleaser and build provenance | Accepted |
 | [0043](0043-meet-openssf-scorecard-expectations-where-a-solo-project-can.md) | Meet OpenSSF Scorecard expectations where a solo project can | Accepted |
+| [0044](0044-accept-one-tag-pinned-reference-for-the-slsa-provenance-generator.md) | Accept one tag-pinned reference for the SLSA provenance generator | Accepted |

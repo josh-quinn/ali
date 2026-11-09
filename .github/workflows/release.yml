@@ -56,8 +56,10 @@ jobs:
           echo "hashes=$(sha256sum -- *.tar.gz checksums.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
 
   # SLSA level 3 provenance, signed and uploaded to the release as
-  # ali.intoto.jsonl. The generator must be referenced by tag (not SHA) so its
-  # identity can be verified; OpenSSF Scorecard exempts it from pinning.
+  # ali.intoto.jsonl. The generator must be referenced by tag (not SHA):
+  # slsa-verifier checks the builder's tag to verify its identity. Scorecard's
+  # Pinned-Dependencies check flags this one reference; that cost is accepted
+  # (ADR 0044).
   provenance:
     needs: [release]
     permissions:
