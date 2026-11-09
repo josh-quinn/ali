@@ -5,6 +5,13 @@ every commit, grouped by type.
 
 ## Unreleased
 
+## 0.1.1 - 2026-11-09
+
+- Release automation: the Homebrew cask step used a template function GoReleaser
+  does not have, so v0.1.0 was published without the cask, attestations or SLSA
+  provenance. Fixed; 0.1.1 is the first complete release. The program itself is
+  unchanged from 0.1.0.
+
 ## 0.1.0 - 2026-11-09
 
 First public release.

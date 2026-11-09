@@ -55,9 +55,10 @@ homebrew_casks:
       name: homebrew-tap
       # A fine-grained token with write access to the tap repository only: the
       # release workflow's own GITHUB_TOKEN cannot push to another repository.
-      token: '{{ envOrDefault "HOMEBREW_TAP_TOKEN" "" }}'
+      # (index yields "" when the variable is unset; GoReleaser has no envOrDefault)
+      token: '{{ index .Env "HOMEBREW_TAP_TOKEN" }}'
     # Without that token, publish the release but skip the cask instead of failing.
-    skip_upload: '{{ if eq (envOrDefault "HOMEBREW_TAP_TOKEN" "") "" }}true{{ else }}false{{ end }}'
+    skip_upload: '{{ if index .Env "HOMEBREW_TAP_TOKEN" }}false{{ else }}true{{ end }}'
     homepage: https://github.com/josh-quinn/ali
     description: Create, find and organise shell aliases without touching .zshrc
     license: MIT
