@@ -73,6 +73,19 @@ jobs:
       - name: Scan every commit for secrets
         run: go run github.com/zricethezav/gitleaks/v8@v8.30.1 git --log-opts="--all" --redact --no-banner -v .
 
+  fuzz:
+    name: fuzz (short run of every target)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Fuzz each target for 20 seconds
+        run: make fuzz FUZZTIME=20s
+
   vulnerabilities:
     name: govulncheck
     runs-on: ubuntu-latest

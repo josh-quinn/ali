@@ -48,3 +48,4 @@ as the change it records.
 | [0040](0040-gate-every-change-with-free-open-source-quality-and-security-checks.md) | Gate every change with free, open-source quality and security checks | Accepted |
 | [0041](0041-scan-for-secrets-before-every-push-and-again-in-ci.md) | Scan for secrets before every push and again in CI | Accepted |
 | [0042](0042-release-from-version-tags-with-goreleaser-and-build-provenance.md) | Release from version tags with GoReleaser and build provenance | Accepted |
+| [0043](0043-meet-openssf-scorecard-expectations-where-a-solo-project-can.md) | Meet OpenSSF Scorecard expectations where a solo project can | Accepted |

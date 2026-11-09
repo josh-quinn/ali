@@ -1,6 +1,6 @@
 VERSION ?= dev
 
-.PHONY: build test vet fmt-check man lint vuln check hooks secrets
+.PHONY: build test vet fmt-check man lint vuln check hooks secrets fuzz
 build:
 	go build -ldflags "-X main.version=$(VERSION)" -o ali ./cmd/ali
 test:
@@ -23,5 +23,14 @@ secrets:
 hooks:
 	git config core.hooksPath .githooks
 	@echo "git hooks enabled: pushes are scanned for secrets (needs gitleaks: brew install gitleaks)"
+# run every fuzz target for FUZZTIME (default 30s) each
+FUZZTIME ?= 30s
+FUZZ_TARGETS = FuzzTokenize:./internal/expand FuzzQuoteRoundTrip:./internal/expand FuzzExpand:./internal/expand \
+	FuzzParse:./internal/importer FuzzParse:./internal/store FuzzInfer:./internal/group
+fuzz:
+	@for t in $(FUZZ_TARGETS); do \
+		name=$${t%%:*}; pkg=$${t#*:}; echo "== $$name $$pkg"; \
+		go test -run='^$$' -fuzz="^$$name\$$" -fuzztime=$(FUZZTIME) $$pkg || exit 1; \
+	done
 # everything CI checks, in one command
 check: fmt-check vet lint test vuln secrets
