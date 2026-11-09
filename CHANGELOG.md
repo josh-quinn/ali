@@ -5,6 +5,13 @@ every commit, grouped by type.
 
 ## Unreleased
 
+## 0.1.2 - 2026-11-09
+
+- Release automation: GoReleaser only accepts a bare `{{ .Env.NAME }}` as the
+  Homebrew token, so 0.1.1 was also published without its cask, attestations or
+  SLSA provenance. Fixed, with a test (`tests/release`) for the publish-time fields
+  that `goreleaser check` cannot validate. The program is unchanged from 0.1.0.
+
 ## 0.1.1 - 2026-11-09
 
 - Release automation: the Homebrew cask step used a template function GoReleaser
