@@ -72,7 +72,12 @@ homebrew_casks:
       post:
         # The binary is not notarized; clear the download quarantine so macOS
         # lets it run (see goreleaser.com/customization/homebrew_casks).
+        # Homebrew's declarative install steps: Ruby such as `#{staged_path}` or
+        # `system_command` makes the cask unreadable (tests/release checks this).
+        # {{staged_path}} is Homebrew's token, so it is escaped from GoReleaser's templates.
         install_steps: |
-          if OS.mac?
-            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/ali"]
+          on_macos do
+            run "/usr/bin/xattr",
+                args:           ["-dr", "com.apple.quarantine", "{{ "{{staged_path}}" }}/ali"],
+                writable_paths: ["{{ "{{staged_path}}" }}"]
           end

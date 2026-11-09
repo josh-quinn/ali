@@ -5,6 +5,11 @@ every commit, grouped by type.
 
 ## Unreleased
 
+## 0.1.3 - 2026-11-09
+
+- Homebrew: the 0.1.2 cask could not be installed ("cask 'ali' is unreadable:
+  undefined local variable or method 'staged_path'"); its quarantine step now uses
+  Homebrew's install steps syntax, with a test that loads it in Homebrew.
 - `ali --version` now reports the real version when installed with
   `go install github.com/josh-quinn/ali/cmd/ali@<version>` (it said `dev`).
 
