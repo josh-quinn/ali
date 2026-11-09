@@ -1,0 +1,24 @@
+#!/bin/sh
+# Rejects commit messages that are not Conventional Commits (ADR 0046).
+# git runs this with the message file; CI runs it on every commit of a pull request.
+set -eu
+
+# The subject is the first line that is neither blank nor a git comment.
+subject=$(grep -v -e '^#' -e '^[[:space:]]*$' "$1" | head -n 1 || true)
+
+types='feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert'
+if printf '%s\n' "$subject" | grep -Eq "^(($types)(\([a-z0-9][a-z0-9._/-]*\))?!?: [^[:space:]]|Merge |fixup! |squash! )"; then
+	exit 0
+fi
+
+cat >&2 <<EOF
+commit-msg: not a Conventional Commit:
+
+  $subject
+
+Write the subject as  type(scope): subject  (scope optional), for example
+  feat(cli): add ali env
+  fix(store): keep comments when saving
+Types: $(echo "$types" | sed 's/|/, /g'). See CONTRIBUTING.md.
+EOF
+exit 1

@@ -13,16 +13,16 @@ man:
 	go run ./internal/tools/gendocs -out man -version $(VERSION)
 lint:
 	golangci-lint run ./...
-	shellcheck .githooks/pre-push
+	shellcheck .githooks/*
 vuln:
 	go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 # scan the whole history (every branch) for secrets, as CI does
 secrets:
 	gitleaks git --log-opts="--all" --redact --no-banner -v .
-# use the repository's git hooks (pre-push secret scan) in this clone
+# use the repository's git hooks (commit message check, pre-push secret scan) in this clone
 hooks:
 	git config core.hooksPath .githooks
-	@echo "git hooks enabled: pushes are scanned for secrets (needs gitleaks: brew install gitleaks)"
+	@echo "git hooks enabled: commit messages are checked; pushes are scanned for secrets (needs gitleaks: brew install gitleaks)"
 # run every fuzz target for FUZZTIME (default 30s) each
 FUZZTIME ?= 30s
 FUZZ_TARGETS = FuzzTokenize:./internal/expand FuzzQuoteRoundTrip:./internal/expand FuzzExpand:./internal/expand \

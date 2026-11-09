@@ -51,3 +51,4 @@ as the change it records.
 | [0043](0043-meet-openssf-scorecard-expectations-where-a-solo-project-can.md) | Meet OpenSSF Scorecard expectations where a solo project can | Accepted |
 | [0044](0044-accept-one-tag-pinned-reference-for-the-slsa-provenance-generator.md) | Accept one tag-pinned reference for the SLSA provenance generator | Accepted |
 | [0045](0045-require-a-code-owner-review-with-an-owner-bypass-for-pull-requests.md) | Require a code-owner review, with an owner bypass for pull requests | Accepted |
+| [0046](0046-enforce-conventional-commits-locally-and-in-ci.md) | Enforce Conventional Commits locally and in CI | Accepted |
