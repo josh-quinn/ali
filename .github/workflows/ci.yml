@@ -73,6 +73,28 @@ jobs:
       - name: Scan every commit for secrets
         run: go run github.com/zricethezav/gitleaks/v8@v8.30.1 git --log-opts="--all" --redact --no-banner -v .
 
+  commits:
+    name: commits (Conventional Commits)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check every commit message in the pull request (ADR 0046)
+        # On pushes to main the commits were already checked in their pull request.
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          status=0
+          for c in $(git rev-list --no-merges "$BASE..$HEAD"); do
+            git log -1 --format=%B "$c" > "$RUNNER_TEMP/msg"
+            .githooks/commit-msg "$RUNNER_TEMP/msg" || { echo "::error::commit $c"; status=1; }
+          done
+          exit "$status"
+
   fuzz:
     name: fuzz (short run of every target)
     runs-on: ubuntu-latest
@@ -111,7 +133,7 @@ jobs:
       - name: Man pages generate
         run: make man && test -s man/ali.1 && find man -type f -name 'ali*' | wc -l
       - name: Lint the git hooks (shellcheck)
-        run: shellcheck .githooks/pre-push
+        run: shellcheck .githooks/*
       - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           version: v2.20.0
