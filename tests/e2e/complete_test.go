@@ -18,7 +18,7 @@ func TestTabCompletesAUniqueValueAndRunsIt(t *testing.T) {
 
 func TestTabListsValuesAndSubAliases(t *testing.T) {
 	s := placeholderSandbox(t)
-	got := s.zle("k g p n @\t\x15k \t\x15echo done\r")
+	got := s.zle("k g p n @\t" + waitFor("@sys") + "\x15k \t" + waitFor("n  p") + "\x15echo done\r")
 	if !regexp.MustCompile(`@one\s+@sys`).MatchString(got) {
 		t.Errorf("values not listed:\n%s", got)
 	}
