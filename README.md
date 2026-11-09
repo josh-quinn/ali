@@ -358,7 +358,7 @@ Other current limits:
 make build          # ./ali
 make check          # everything CI checks: fmt, vet, golangci-lint, tests, govulncheck
 make man            # man pages into man/
-make hooks          # once per clone: scan every push for secrets (needs gitleaks)
+make hooks          # once per clone: check commit messages, scan every push for secrets
 ```
 
 Linting needs [golangci-lint](https://golangci-lint.run) v2 and

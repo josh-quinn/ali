@@ -1,0 +1,63 @@
+name: Bug report
+description: ali does something wrong or unexpected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Security problems**: please report them privately instead (see SECURITY.md).
+        Running `ali doctor` first often explains setup problems.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The exact commands you ran, ideally starting from a new terminal.
+      placeholder: |
+        1. ali add gp 'git pull'
+        2. gp
+    validations:
+      required: true
+  - type: input
+    id: ali
+    attributes:
+      label: ali version
+      description: Output of `ali --version`
+    validations:
+      required: true
+  - type: input
+    id: zsh
+    attributes:
+      label: zsh version
+      description: Output of `zsh --version`
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 26.1 (arm64)
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install ali?
+      options: [Homebrew, go install, Release archive, Built from source]
+    validations:
+      required: true
+  - type: input
+    id: framework
+    attributes:
+      label: Zsh framework or plugins
+      description: For example Oh My Zsh, zinit, fzf, zsh-autosuggestions. Leave empty if none.
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `ali doctor`
+      render: text

@@ -15,7 +15,7 @@ Thanks for helping. A few ground rules, taken from the project [constitution](.s
 
 ```sh
 brew install golangci-lint gitleaks shellcheck
-make hooks     # once per clone: every git push is scanned for secrets first
+make hooks     # once per clone: commit messages are checked, every git push is scanned for secrets
 make check     # fmt, vet, golangci-lint, tests, govulncheck, gitleaks: what CI runs
 ```
 
@@ -28,7 +28,8 @@ CI also runs CodeQL, OpenSSF Scorecard, dependency review, actionlint and
 
 Commits are small, single-purpose and green (`make fmt-check vet test` passes at every
 commit), written as [Conventional Commits](https://www.conventionalcommits.org/)
-(`feat(cli): ...`, `fix(store): ...`). Hard-to-reverse decisions get an ADR in
+(`feat(cli): ...`, `fix(store): ...`). The `commit-msg` hook and a required CI check enforce
+this (ADR 0046); reword a rejected commit with `git commit --amend` or `git rebase -i`. Hard-to-reverse decisions get an ADR in
 [`docs/adr/`](docs/adr) in the same commit. Both are project rules; see the constitution.
 
 Pull requests to `main` need every required check to pass and an approving review
