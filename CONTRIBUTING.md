@@ -30,3 +30,6 @@ Commits are small, single-purpose and green (`make fmt-check vet test` passes at
 commit), written as [Conventional Commits](https://www.conventionalcommits.org/)
 (`feat(cli): ...`, `fix(store): ...`). Hard-to-reverse decisions get an ADR in
 [`docs/adr/`](docs/adr) in the same commit. Both are project rules; see the constitution.
+
+Pull requests to `main` need every required check to pass and an approving review
+from a code owner ([`.github/CODEOWNERS`](.github/CODEOWNERS), ADR 0045).
