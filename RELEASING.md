@@ -43,7 +43,9 @@ does the rest ([ADR 0042](docs/adr/0042-release-from-version-tags-with-gorelease
 
 If a release goes wrong, fix the problem on `main` and release the next patch
 version; never move or reuse a published tag (Go's checksum database may already
-have recorded it). Mark the broken release's notes as superseded.
+have recorded it). Delete the broken GitHub Release but keep its tag
+(`gh release delete vX.Y.Z --yes`), so every release on GitHub is complete and
+signed; v0.1.0 and v0.1.1 were removed this way and survive only as tags.
 
 Changing `.goreleaser.yaml`? `goreleaser check` and snapshot builds do not evaluate
 templates that only run when publishing (such as the Homebrew cask's `token` and
