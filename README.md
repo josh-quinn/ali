@@ -62,11 +62,15 @@ Pick one:
 | Go | `go install github.com/josh-quinn/ali/cmd/ali@latest` | Puts `ali` in `$(go env GOPATH)/bin`, usually `~/go/bin`. |
 | From source | `git clone https://github.com/josh-quinn/ali && cd ali && make build` | Produces `./ali`; copy it somewhere on your `PATH`, e.g. `cp ali ~/.local/bin/`. `make man` builds the man pages into `man/`. |
 
-Release archives carry build-provenance attestations, so you can check that a
-download was built by this repository's release workflow:
+Release archives carry build-provenance attestations and signed SLSA level 3
+provenance (`ali.intoto.jsonl` on each release), so you can check that a download was
+built by this repository's release workflow:
 
 ```sh
 gh attestation verify ali_<version>_darwin_arm64.tar.gz --repo josh-quinn/ali
+# or, with slsa-verifier:
+slsa-verifier verify-artifact ali_<version>_darwin_arm64.tar.gz \
+  --provenance-path ali.intoto.jsonl --source-uri github.com/josh-quinn/ali --source-tag v<version>
 ```
 
 Then make sure your shell can find it:

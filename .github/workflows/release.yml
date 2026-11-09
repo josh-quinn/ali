@@ -12,6 +12,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      hashes: ${{ steps.hashes.outputs.hashes }}
     permissions:
       contents: write     # create the GitHub Release and upload assets
       id-token: write     # sign build provenance with Sigstore
@@ -47,3 +49,23 @@ jobs:
           subject-path: |
             dist/*.tar.gz
             dist/checksums.txt
+      - name: Hashes of the published files (for SLSA provenance)
+        id: hashes
+        run: |
+          cd dist
+          echo "hashes=$(sha256sum -- *.tar.gz checksums.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+  # SLSA level 3 provenance, signed and uploaded to the release as
+  # ali.intoto.jsonl. The generator must be referenced by tag (not SHA) so its
+  # identity can be verified; OpenSSF Scorecard exempts it from pinning.
+  provenance:
+    needs: [release]
+    permissions:
+      actions: read   # read the workflow run
+      id-token: write # sign the provenance
+      contents: write # upload it to the release
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    with:
+      base64-subjects: "${{ needs.release.outputs.hashes }}"
+      upload-assets: true
+      provenance-name: ali.intoto.jsonl

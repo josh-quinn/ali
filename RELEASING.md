@@ -28,12 +28,15 @@ does the rest ([ADR 0042](docs/adr/0042-release-from-version-tags-with-gorelease
 
 5. Watch the release workflow. It refuses tags that are not on `main`, runs the
    tests, publishes the GitHub Release with archives, checksums and generated release
-   notes, attests build provenance, and updates the Homebrew cask.
+   notes, attests build provenance, adds signed SLSA provenance (`ali.intoto.jsonl`)
+   to the release, and updates the Homebrew cask.
 6. Check the release:
 
    ```sh
    gh release view v0.2.0
    gh attestation verify ali_0.2.0_darwin_arm64.tar.gz --repo josh-quinn/ali
+   slsa-verifier verify-artifact ali_0.2.0_darwin_arm64.tar.gz \
+     --provenance-path ali.intoto.jsonl --source-uri github.com/josh-quinn/ali --source-tag v0.2.0
    brew update && brew upgrade --cask ali   # or: brew install --cask josh-quinn/tap/ali
    ali --version
    ```
