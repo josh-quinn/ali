@@ -5,13 +5,27 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
+	"strings"
 
 	"github.com/josh-quinn/ali/internal/cli"
 	"github.com/josh-quinn/ali/internal/store"
 )
 
-// version is set at build time via -ldflags "-X main.version=...".
+// version is set at build time via -ldflags "-X main.version=..." (releases).
 var version = "dev"
+
+// resolveVersion prefers the stamped version and otherwise uses the module
+// version Go records for "go install module@version" builds.
+func resolveVersion(stamped string, info *debug.BuildInfo) string {
+	if stamped != "dev" || info == nil {
+		return stamped
+	}
+	if v := info.Main.Version; v != "" && v != "(devel)" {
+		return strings.TrimPrefix(v, "v")
+	}
+	return stamped
+}
 
 func main() {
 	dir, err := store.DefaultDir()
@@ -19,7 +33,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, "ali:", err)
 		os.Exit(1)
 	}
-	root := cli.NewRoot(version, store.New(dir), os.Stdout, os.Stderr)
+	info, _ := debug.ReadBuildInfo()
+	root := cli.NewRoot(resolveVersion(version, info), store.New(dir), os.Stdout, os.Stderr)
 	if err := root.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, "ali:", err)
 		if cli.IsUsage(err) {

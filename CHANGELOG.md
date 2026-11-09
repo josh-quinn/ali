@@ -5,6 +5,9 @@ every commit, grouped by type.
 
 ## Unreleased
 
+- `ali --version` now reports the real version when installed with
+  `go install github.com/josh-quinn/ali/cmd/ali@<version>` (it said `dev`).
+
 ## 0.1.2 - 2026-11-09
 
 - Release automation: GoReleaser only accepts a bare `{{ .Env.NAME }}` as the
