@@ -3,6 +3,7 @@
 [![ci](https://github.com/josh-quinn/ali/actions/workflows/ci.yml/badge.svg)](https://github.com/josh-quinn/ali/actions/workflows/ci.yml)
 [![codeql](https://github.com/josh-quinn/ali/actions/workflows/codeql.yml/badge.svg)](https://github.com/josh-quinn/ali/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/josh-quinn/ali/badge)](https://scorecard.dev/viewer/?uri=github.com/josh-quinn/ali)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16489/badge)](https://www.bestpractices.dev/projects/16489)
 
 Create, find and organise shell aliases from the terminal, without ever opening `.zshrc`.
 
