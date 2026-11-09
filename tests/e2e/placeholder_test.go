@@ -47,7 +47,8 @@ func TestUnresolvedPlaceholderDoesNotRun(t *testing.T) {
 	s := placeholderSandbox(t)
 	s.ali("var", "add", "ctx", "dev=dev-cluster")
 	s.ali("sub", "add", "kubectl", "c", "--context={{ctx}}")
-	got := s.zle("k g p c\r\x15echo after\r") // Ctrl-U clears the line kept in the editor
+	// wait for ali's message before Ctrl-U clears the line it kept in the editor
+	got := s.zle("k g p c\r" + waitFor("no value for") + "\x15echo after\r")
 	if strings.Contains(got, "[get]") {
 		t.Errorf("line ran without a value for ctx:\n%s", got)
 	}

@@ -46,14 +46,15 @@ func TestPromptShowsTheEnvironment(t *testing.T) {
 
 func TestProtectedEnvironmentNeedsASecondEnter(t *testing.T) {
 	s := envSandbox(t)
-	once := s.zle("ali env use prod\rk g p n\r\x15echo cancelled\r") // Enter, then Ctrl-U clears the kept line
+	// Enter, wait for the protected notice, then Ctrl-U clears the kept line
+	once := s.zle("ali env use prod\rk g p n\r" + waitFor("press Enter again") + "\x15echo cancelled\r")
 	if strings.Contains(once, "[production]") {
 		t.Errorf("ran after a single Enter:\n%s", once)
 	}
 	if !strings.Contains(once, "protected") || !hasLine(once, "cancelled") {
 		t.Errorf("want a protected notice and a usable shell:\n%s", once)
 	}
-	twice := s.zle("ali env use prod\rk g p n\r\r")
+	twice := s.zle("ali env use prod\rk g p n\r" + waitFor("press Enter again") + "\r")
 	if strings.Count(twice, "[get][pods][-n][production]") != 1 {
 		t.Errorf("second Enter should run it exactly once:\n%s", twice)
 	}
