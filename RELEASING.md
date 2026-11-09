@@ -41,5 +41,12 @@ does the rest ([ADR 0042](docs/adr/0042-release-from-version-tags-with-gorelease
    ali --version
    ```
 
-If a release goes wrong, delete the GitHub Release and the tag, fix the problem on
-`main`, and release the next patch version rather than reusing the number.
+If a release goes wrong, fix the problem on `main` and release the next patch
+version; never move or reuse a published tag (Go's checksum database may already
+have recorded it). Mark the broken release's notes as superseded.
+
+Changing `.goreleaser.yaml`? `goreleaser check` and snapshot builds do not evaluate
+templates that only run when publishing (such as the Homebrew cask's `token` and
+`skip_upload`). That is how v0.1.0 shipped without its cask. To test such a
+template, put the same expression in a temporary `before.hooks` entry, e.g.
+`echo "{{ index .Env "HOMEBREW_TAP_TOKEN" }}"`, and run a snapshot.
